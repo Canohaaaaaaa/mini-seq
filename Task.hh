@@ -1,8 +1,6 @@
 #pragma once
 #include <functional>
-#include "Task.hh"
 #include "Socket.hh"
-#include <iostream>
 
 class Task{
 	std::function<void(size_t, void *, size_t, void *)> func;

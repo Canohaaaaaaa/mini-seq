@@ -1,7 +1,7 @@
 #pragma once
 #include <cstddef>
-#include <iostream>
 #include "Task.hh"
+
 class Socket{
 	public:
 	void *data;
