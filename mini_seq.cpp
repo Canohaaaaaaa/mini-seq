@@ -6,7 +6,6 @@
 #define SIZE 1000
 #define SIZE_SEQ 30
 #define DETAIL false
-#define SHOW_OUTPUTS false
 
 using namespace std::chrono;
 using std::function, std::vector;
