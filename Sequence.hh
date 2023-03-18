@@ -31,7 +31,6 @@ class Sequence{
 			}
 		}
 		else{
-			cout << "AYAYAYA" << endl;
 			Socket* socket_in_out = new InOut(ordre[0].size_in);
 			sockets.push_back(socket_in_out);
 			for(Triplet t : ordre){
