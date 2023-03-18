@@ -7,15 +7,14 @@
 using std::cout;
 using std::endl;
 
-class  SocketV2
+class  Socket
 {
 	protected:
 	void *data;
 	size_t size;
 	public:
-	SocketV2(size_t taille) : size(taille){}
-	~SocketV2() {free(data);}
-
+	Socket(size_t taille) : size(taille){}
+	virtual ~Socket(){};
 	size_t get_size(){
 		return size;
 	}
@@ -24,24 +23,29 @@ class  SocketV2
 		this->data = data;
 	}
 
+	void* get_data(){
+		return data;
+	}
+
 	virtual void* write(){
 		return nullptr;
 	};
 	virtual void* read(){
-		return data;
+		return nullptr;
 	};
+
 	void display(){
 		cout << "size :" << size << endl;
 		int * int_array = (int*)data;
-		for(int i=0; i < size; i++){
+		for(size_t i=0; i < size; i++){
 			cout << int_array[i] << endl;
 		}
 	}
 };
 
-class Input : public SocketV2 {
+class Input : public Socket {
 	public : 
-	Input(size_t taille) : SocketV2(taille){}
+	Input(size_t taille) : Socket(taille){}
 
 	void* read(){
 		return data;
@@ -50,10 +54,10 @@ class Input : public SocketV2 {
 
 
 
-class Output : public SocketV2 {
+class Output : public Socket {
 	public : 
 
-	Output(size_t taille) : SocketV2(taille){}
+	Output(size_t taille) : Socket(taille){}
 	~Output(){free(data);}
 
 	void* write(){ //Les output sockets 
@@ -62,10 +66,9 @@ class Output : public SocketV2 {
 	}
 };
 
-class InOut : public SocketV2{
+class InOut : public Socket{
 	public : 
-	InOut(size_t taille) : SocketV2(taille){}
-	~InOut(){free(data);}
+	InOut(size_t taille) : Socket(taille){}
 
 	void* write(){
 		return data;
