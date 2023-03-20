@@ -1,10 +1,11 @@
 #include <cstddef>
 #include <iostream>
 #include <chrono>
+#include <fstream>
 #include "Task.hh"
 #include "Sequence.hh"
-#define SIZE 1000
-#define SIZE_SEQ 30
+#define SIZE 10000
+#define SIZE_SEQ 100
 #define DETAIL false
 
 using namespace std::chrono;
@@ -20,24 +21,24 @@ void increment(size_t size_in, void*in , size_t size_out, void *out){
 
 function<void(size_t, void*, size_t, void*)> func_inc = increment;
 
-void sequence(){
+void sequence(int size){
 	vector<Triplet> v; //Liste des taches <Taille_entree, Taille_Sortie, fonction>
 	Sequence seq(v);
-	v.push_back(Triplet(SIZE, SIZE, func_inc));
-	v.push_back(Triplet(SIZE, SIZE, func_inc));
-	v.push_back(Triplet(SIZE, SIZE, func_inc));
+	v.push_back(Triplet(size, size, func_inc));
+	v.push_back(Triplet(size, size, func_inc));
+	v.push_back(Triplet(size, size, func_inc));
 
-	int *in = (int*)malloc(sizeof(int) * SIZE);
-	for(int i = 0; i < SIZE; i++){
+	int *in = (int*)malloc(sizeof(int) * size);
+	for(int i = 0; i < size; i++){
 		in[i] = i; 
 	}
 	seq.exec(in);
 	free(in);
 }
 
-void bench_sequence(){
+void bench_sequence(int size_seq,std::ofstream& file){
 	vector<Triplet> v;
-	for(int i=0; i < SIZE_SEQ; i++){
+	for(int i=0; i < size_seq; i++){
 		v.push_back(Triplet(SIZE, SIZE, func_inc));
 	}
 	int *in = (int*)malloc(sizeof(int) * SIZE);
@@ -55,7 +56,8 @@ void bench_sequence(){
 		auto time_taken = seq_copy.timestamps[i] - seq_copy.timestamps[i-1];
 		cout << "Temps de traitement de la tache "<< i << " (Sequence avec copie) : " << duration_cast<microseconds>(time_taken).count() << "ms" << endl;
 	}
-	cout << "Temps total (Sequence avec copie) : " << duration_cast<microseconds>(seq_end-seq_start).count() << "ms" << endl;
+	//cout << "Temps total (Sequence avec copie) : " << duration_cast<microseconds>(seq_end-seq_start).count() << "ms" << endl;
+	file << duration_cast<microseconds>(seq_end-seq_start).count() << "\t";
 	//----------COPYLESS-BENCH----------//
 	seq_start = seq_copyless.timestamps[0];
 	seq_end = seq_copyless.timestamps[seq_copyless.timestamps.size()-1];
@@ -63,22 +65,24 @@ void bench_sequence(){
 		auto time_taken = seq_copyless.timestamps[i] - seq_copyless.timestamps[i-1];
 		cout << "Temps de traitement de la tache "<< i << " (Sequence avec copie) : " << duration_cast<microseconds>(time_taken).count() << "ms" << endl;
 	}
-	cout << "Temps total (Sequence sans copie) : " << duration_cast<microseconds>(seq_end-seq_start).count() << "ms" << endl;
-
+	//cout << "Temps total (Sequence sans copie) : " << duration_cast<microseconds>(seq_end-seq_start).count() << "ms" << endl;
+	file <<  duration_cast<microseconds>(seq_end-seq_start).count()<< endl;
 	free(in);
 }
 
-void tache(){
-	int *in = (int*)malloc(sizeof(int) * SIZE);
-	for(int i = 0; i < SIZE; i++){
+void tache(int size){
+	int *in = (int*)malloc(sizeof(int) * size);
+	for(int i = 0; i < size; i++){
 		in[i] = i; 
 	}
 
+
+
 	//###Sockets###//
-	Socket *socket_1 = new Input(SIZE);
-	Socket *socket_2 = new Output(SIZE);
-	Socket *socket_3 = new Input(SIZE);
-	Socket *socket_4 = new Output(SIZE);
+	Socket *socket_1 = new Input(size);
+	Socket *socket_2 = new Output(size);
+	Socket *socket_3 = new Input(size);
+	Socket *socket_4 = new Output(size);
 	//###Binding###//
 	Task task_1(func_inc, *socket_1, *socket_2);
 	Task task_2(func_inc, *socket_3, *socket_4);
@@ -103,7 +107,7 @@ void tache(){
 	}
 
 	//###Version InOut###//
-	Socket *socket_1_io = new InOut(SIZE);
+	Socket *socket_1_io = new InOut(size);
 	socket_1_io->set_data(in);
 	
 	Task task_1_io(func_inc, *socket_1_io, *socket_1_io);
@@ -127,19 +131,18 @@ void tache(){
 	delete socket_1_io;
 }
 
-void bench_tache(){
-	int *in = (int*)malloc(sizeof(int) * SIZE);
-	for(int i = 0; i < SIZE; i++){
+void bench_tache(int size,std::ofstream& file){
+	int *in = (int*)malloc(sizeof(int) * size);
+	for(int i = 0; i < size; i++){
 		in[i] = i; 
 	}
-
 	//###Sockets###//
-	Socket *socket_1 = new Input(SIZE);
-	Socket *socket_2 = new Output(SIZE);
-	Socket *socket_3 = new Input(SIZE);
-	Socket *socket_4 = new Output(SIZE);
-	Socket *socket_5 = new Input(SIZE);
-	Socket *socket_6 = new Output(SIZE);
+	Socket *socket_1 = new Input(size);
+	Socket *socket_2 = new Output(size);
+	Socket *socket_3 = new Input(size);
+	Socket *socket_4 = new Output(size);
+	Socket *socket_5 = new Input(size);
+	Socket *socket_6 = new Output(size);
 	socket_1->set_data(in); // Mise en place de l'entrée du programme
 	//###Binding###//
 	Task task_1(func_inc, *socket_1, *socket_2);
@@ -153,10 +156,10 @@ void bench_tache(){
 	socket_5->set_data(socket_4->get_data());
 	task_3.exec();
 	auto end = steady_clock::now();
-	cout << "Temps de traitement total (Suite de Taches avec copie) : "<< duration_cast<microseconds>(end-start).count() << "ms" << endl;
-
+	//cout << "Temps de traitement total (Suite de Taches avec copie) : "<< duration_cast<microseconds>(end-start).count() << "ms" << endl;
+	file << duration_cast<microseconds>(end-start).count() << "\t";
 	//###Version InOut###//
-	Socket *socket_1_io = new InOut(SIZE);
+	Socket *socket_1_io = new InOut(size);
 	socket_1_io->set_data(in);
 	
 	Task task_1_io(func_inc, *socket_1_io, *socket_1_io);
@@ -170,7 +173,8 @@ void bench_tache(){
 	end = steady_clock::now();
 
 
-	cout << "Temps de traitement total (Suite de Taches sans copie) : "<< duration_cast<microseconds>(end-start).count() << "ms" << endl;
+	//cout << "Temps de traitement total (Suite de Taches sans copie) : "<< duration_cast<microseconds>(end-start).count() << "ms" << endl;
+	file << duration_cast<microseconds>(end-start).count() << endl;
 	free(in);
 	delete socket_1;
 	delete socket_2;
@@ -182,9 +186,16 @@ void bench_tache(){
 }
 
 int main(void){
-	tache();
-	sequence();
-	bench_tache();
-	bench_sequence();
+
+	std::ofstream out_put_data;
+	out_put_data.open("evolution_sequence_size_seq.dat",std::ios::trunc);
+	cout << "ouverture du fichier" << endl;
+	for(int i= 10;i<1000000;i=i*5){
+	out_put_data << i << "\t";
+	//tache(i);
+	//sequence();
+	//bench_tache(i,out_put_data);
+	bench_sequence(i,out_put_data);
+	}
 	return 0;
 }

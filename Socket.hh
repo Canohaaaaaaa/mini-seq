@@ -61,7 +61,7 @@ class Output : public Socket {
 	~Output(){free(data);}
 
 	void* write(){ //Les output sockets 
-		data = malloc(size*4);
+		data = malloc(size*sizeof(int)); // On suppose travailler avec des entiers pour cette version 
 		return data;
 	}
 };
