@@ -13,13 +13,13 @@ class  Socket
 	void *data;
 	size_t size;
 	public:
-	Socket(size_t taille) : size(taille){}
+	Socket(size_t taille) :size(taille){} 
 	virtual ~Socket(){};
 	size_t get_size(){
 		return size;
 	}
 
-	void set_data(void* data){
+	void set_data(void* data){ // On essayera de donner à la socket un espace dépendant de la socket !!
 		this->data = data;
 	}
 
@@ -27,9 +27,7 @@ class  Socket
 		return data;
 	}
 
-	virtual void* write(){
-		return nullptr;
-	};
+	virtual void write(){};
 	virtual void* read(){
 		return nullptr;
 	};
@@ -60,9 +58,8 @@ class Output : public Socket {
 	Output(size_t taille) : Socket(taille){}
 	~Output(){free(data);}
 
-	void* write(){ //Les output sockets 
+	void write(){ //Les output sockets 
 		data = malloc(size*sizeof(int)); // On suppose travailler avec des entiers pour cette version 
-		return data;
 	}
 };
 
@@ -70,9 +67,6 @@ class InOut : public Socket{
 	public : 
 	InOut(size_t taille) : Socket(taille){}
 
-	void* write(){
-		return data;
-	};
 	void* read(){
 		return data;
 	}
