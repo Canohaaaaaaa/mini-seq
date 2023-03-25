@@ -22,13 +22,10 @@ void increment(size_t size_in, void*in , size_t size_out, void *out){
 function<void(size_t, void*, size_t, void*)> func_inc = increment;
 
 void sequence(){
-	vector<Triplet> v; //Liste des taches <Taille_entree, Taille_Sortie, fonction>
-	
-	v.push_back(Triplet(SIZE, SIZE, func_inc));
-	v.push_back(Triplet(SIZE, SIZE, func_inc));
-	v.push_back(Triplet(SIZE, SIZE, func_inc));
-
-	Sequence seq(v);
+	Sequence seq;
+	seq.addTask(SIZE, SIZE, func_inc);
+	seq.addTask(SIZE, SIZE, func_inc);
+	seq.addTask(SIZE, SIZE, func_inc);
 
 	int *in = (int*)malloc(sizeof(int) * SIZE);
 	for(int i = 0; i < SIZE; i++){
@@ -39,10 +36,6 @@ void sequence(){
 }
 
 void bench_sequence(int size_seq){
-	vector<Triplet> v;
-	for(int i=0; i < size_seq; i++){
-		v.push_back(Triplet(SIZE, SIZE, func_inc));
-	}
 	int *in = (int*)malloc(sizeof(int) * SIZE);
 	for(int i = 0; i < SIZE; i++){
 		in[i] = i; 
@@ -51,9 +44,12 @@ void bench_sequence(int size_seq){
 	for(int i=0; i < size_seq; i++){
 		seq_copy.addTask(SIZE, SIZE, func_inc);
 	}
-	Sequence seq_copyless(v, true);
-	seq_copy.exec(in, true);
-	seq_copyless.exec(in, true);
+	Sequence seq_copyless;
+	for(int i=0; i < size_seq; i++){
+		seq_copyless.addTask(SIZE, func_inc);
+	}
+	seq_copy.exec(in);
+	seq_copyless.exec(in);
 	//----------COPY-BENCH----------//
 	auto seq_start = seq_copy.timestamps[0];
 	auto seq_end = seq_copy.timestamps[seq_copy.timestamps.size()-1];
