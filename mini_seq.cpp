@@ -4,8 +4,8 @@
 #include <fstream>
 #include "Task.hh"
 #include "Sequence.hh"
-#define SIZE 1000
-#define SIZE_SEQ 100
+#define SIZE 1000000
+#define SIZE_SEQ 10000
 #define DETAIL true
 
 using namespace std::chrono;
@@ -38,7 +38,7 @@ void sequence(){
 	free(in);
 }
 
-void bench_sequence(int size_seq,std::ofstream& file){
+void bench_sequence(int size_seq){
 	vector<Triplet> v;
 	for(int i=0; i < size_seq; i++){
 		v.push_back(Triplet(SIZE, SIZE, func_inc));
@@ -47,7 +47,10 @@ void bench_sequence(int size_seq,std::ofstream& file){
 	for(int i = 0; i < SIZE; i++){
 		in[i] = i; 
 	}
-	Sequence seq_copy(v);
+	Sequence seq_copy;
+	for(int i=0; i < size_seq; i++){
+		seq_copy.addTask(SIZE, SIZE, func_inc);
+	}
 	Sequence seq_copyless(v, true);
 	seq_copy.exec(in, true);
 	seq_copyless.exec(in, true);
@@ -58,17 +61,17 @@ void bench_sequence(int size_seq,std::ofstream& file){
 		auto time_taken = seq_copy.timestamps[i] - seq_copy.timestamps[i-1];
 		cout << "Temps de traitement de la tache "<< i << " (Sequence avec copie) : " << duration_cast<microseconds>(time_taken).count() << "ms" << endl;
 	}
-	//cout << "Temps total (Sequence avec copie) : " << duration_cast<microseconds>(seq_end-seq_start).count() << "ms" << endl;
-	file << duration_cast<microseconds>(seq_end-seq_start).count() << "\t";
+	cout << "Temps total (Sequence avec copie) : " << duration_cast<microseconds>(seq_end-seq_start).count() << "ms" << endl;
+	//file << duration_cast<microseconds>(seq_end-seq_start).count() << "\t";
 	//----------COPYLESS-BENCH----------//
 	seq_start = seq_copyless.timestamps[0];
 	seq_end = seq_copyless.timestamps[seq_copyless.timestamps.size()-1];
 	for(size_t i=1; i < seq_copyless.timestamps.size() && DETAIL; i++){
 		auto time_taken = seq_copyless.timestamps[i] - seq_copyless.timestamps[i-1];
-		cout << "Temps de traitement de la tache "<< i << " (Sequence avec copie) : " << duration_cast<microseconds>(time_taken).count() << "ms" << endl;
+		cout << "Temps de traitement de la tache "<< i << " (Sequence sans copie) : " << duration_cast<microseconds>(time_taken).count() << "ms" << endl;
 	}
-	//cout << "Temps total (Sequence sans copie) : " << duration_cast<microseconds>(seq_end-seq_start).count() << "ms" << endl;
-	file <<  duration_cast<microseconds>(seq_end-seq_start).count()<< endl;
+	cout << "Temps total (Sequence sans copie) : " << duration_cast<microseconds>(seq_end-seq_start).count() << "ms" << endl;
+	//file <<  duration_cast<microseconds>(seq_end-seq_start).count()<< endl;
 	free(in);
 }
 
@@ -194,14 +197,14 @@ void bench_tache(int size,std::ofstream& file){
 
 int main(void){
 
-	std::ofstream out_put_data;
-	out_put_data.open("evolution_sequence_size_seq.dat",std::ios::trunc);
-	cout << "ouverture du fichier" << endl;
-	int i= 40;
+	//std::ofstream out_put_data;
+	//out_put_data.open("evolution_sequence_size_seq.dat",std::ios::trunc);
+	//cout << "ouverture du fichier" << endl;
+	int i= 10;
 	//tache(i);
-	sequence();
+	//sequence();
 	//bench_tache(i,out_put_data);
-	//bench_sequence(i,out_put_data);
+	bench_sequence(i);
 	
 	return 0;
 }

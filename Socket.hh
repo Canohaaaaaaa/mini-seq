@@ -67,6 +67,9 @@ class InOut : public Socket{
 	public : 
 	InOut(size_t taille) : Socket(taille){}
 
+	void write(){ //Les output sockets 
+		data = malloc(size*sizeof(int)); // On suppose travailler avec des entiers pour cette version 
+	}
 	void* read(){
 		return data;
 	}
