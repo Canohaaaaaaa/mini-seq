@@ -10,7 +10,6 @@ using namespace std::chrono;
 using std::vector, std::function;
 
 class Sequence{
-	bool inOutShouldAlloc = true;
 	vector<Task> tasks;
 	vector<std::pair<Socket*,Socket*>> sockets;
 	public:
@@ -22,34 +21,27 @@ class Sequence{
 		}
 	}
 
-	void addTask(size_t size_in, size_t size_out, function<void(size_t, void*, size_t, void*)> func){
-		Socket* socket_in = new Input(size_in);
-		Socket* socket_out = new Output(size_out);
-		socket_out->write();
+	void add_task(size_t size_in, size_t size_out, function<void(size_t, void*, size_t, void*)> func){
+		Input *socket_in = new Input(size_in);
+		Output *socket_out = new Output(size_out);
 		if(sockets.size()){
 			socket_in->set_data(sockets.back().second->get_data());
 		}
 		sockets.push_back(std::make_pair(socket_in, socket_out));
 		Task newTask(func, socket_in, socket_out);
-		newTask.set_data(socket_out->get_data());
 		tasks.push_back(newTask);
-		inOutShouldAlloc = true;
 	}
 
-	void addTask(size_t size, function<void(size_t, void*, size_t, void*)> func){
-		Socket* socketInOut = new InOut(size);
-		if(inOutShouldAlloc) {
-			socketInOut->write();
-			inOutShouldAlloc = false;
+	void add_task(size_t size, function<void(size_t, void*, size_t, void*)> func){
+		InOut *socketInOut = new InOut(size);
+		if(!sockets.size() || !dynamic_cast<InOut*>(sockets.back().second)) {
+			socketInOut->alloc();
 		}
 		else{
 			socketInOut->set_data(sockets.back().second->get_data());
 		}
-		if(sockets.size()){
-		}
 		sockets.push_back(std::make_pair(socketInOut, socketInOut));
 		Task newTask(func, socketInOut, socketInOut);
-		newTask.set_data(socketInOut->get_data());
 		tasks.push_back(newTask);
 	}
 

@@ -5,28 +5,36 @@
 using std::function;
 class Task{
 	function<void(size_t, void*, size_t, void*)> func;
-	Socket *socket_in;
-	Socket *socket_out;
-	void* data;
+	Socket *input_socket;
+	Socket *ouput_socket;
+	size_t input_size, output_size;
+	void *input_data, *output_data;
 
 	public:
-	Task(function<void(size_t, void*, size_t, void*)> func, Socket* socket_in ,Socket *socket_out) : func(func), socket_in(socket_in), socket_out(socket_out) {}
+	Task(function<void(size_t, void*, size_t, void*)> func, Socket *input_socket, Socket *ouput_socket) : func(func), input_socket(input_socket), ouput_socket(ouput_socket) {
+		input_size = input_socket->get_size();
+		input_data = input_socket->get_data();
+		output_size = ouput_socket->get_size();
+		output_data = ouput_socket->get_data();
+	}
+
 	void exec(){
-		func(socket_in->get_size(), socket_in->read(), socket_out->get_size(), data); // On fait l'hypothèse que la taille des entrée est la même que les sorties 
+		func(input_size, input_socket->get_data(), output_size, ouput_socket->get_data());
 	}
 
-	Socket* get_input_socket(){
-		return socket_in;
+	Socket *get_input_socket(){
+		return input_socket;
 	}
 
-	Socket* get_output_socket(){
-		return socket_out;
+	Socket *get_output_socket(){
+		return ouput_socket;
 	}
 
-	void* get_data(){
-		return data;
+	void *get_output_data(){
+		return output_data;
 	}
-	void set_data(void* data){
-		this->data = data;
+
+	void *get_intput_data(){
+		return input_data;
 	}
 };
