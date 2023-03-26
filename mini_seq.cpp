@@ -5,33 +5,53 @@
 #include "Task.hh"
 #include "Sequence.hh"
 #define SIZE 10000000
-#define SIZE_SEQ 5
+#define SIZE_SEQ 100000
 #define DETAIL true
 
 using namespace std::chrono;
 using std::function, std::vector;
 
-void increment(size_t size_in, void*in , size_t size_out, void *out){
-	int * in_int_array = (int*)in;
-	int * out_int_array = (int*)out;
+void increment(size_t size_in, void *in_data, size_t size_out, void *out_data){
+	int * in_int_array = (int*)in_data;
+	int * out_int_array = (int*)out_data;
 	for(size_t i=0; i < size_in; i++){
 		out_int_array[i] = in_int_array[i] + 1;
 	}
 }
 
-function<void(size_t, void*, size_t, void*)> func_inc = increment;
+void increment_io(size_t size_in, void *data){
+	int * in_int_array = (int*)data;
+	for(size_t i=0; i < size_in; i++){
+		in_int_array[i] = in_int_array[i] + 1;
+	}
+}
 
 void sequence(){
 	Sequence seq;
-	seq.add_task(SIZE, SIZE, func_inc);
-	seq.add_task(SIZE, SIZE, func_inc);
-	seq.add_task(SIZE, SIZE, func_inc);
+	Sequence seq_io;
+	seq.add_task(SIZE, SIZE, increment);
+	seq.add_task(SIZE, SIZE, increment);
+	seq.add_task(SIZE, SIZE, increment);
+
+	seq_io.add_task(SIZE, increment_io);
+	seq_io.add_task(SIZE, SIZE, increment);
+	seq_io.add_task(SIZE, increment_io);
+	seq_io.add_task(SIZE, increment_io);
+	seq_io.add_task(SIZE, SIZE, increment);
+	seq_io.add_task(SIZE, increment_io);
+	seq_io.add_task(SIZE, increment_io);
+	seq_io.add_task(SIZE, SIZE, increment);
+	seq_io.add_task(SIZE, increment_io);
 
 	int *in = (int*)malloc(sizeof(int) * SIZE);
 	for(int i = 0; i < SIZE; i++){
 		in[i] = i; 
 	}
-	seq.exec(in);
+	
+	seq.set_input(in);
+	seq.exec();
+	seq_io.set_input(in);
+	seq_io.exec();
 	free(in);
 }
 
@@ -46,12 +66,14 @@ void bench_sequence(int size_seq){
 	Sequence seq_copy;
 	Sequence seq_copyless;
 	for(int i=0; i < size_seq; i++){
-		seq_copy.add_task(SIZE, SIZE, func_inc);
-		seq_copyless.add_task(SIZE, func_inc);
+		seq_copy.add_task(SIZE, SIZE, increment);
+		seq_copyless.add_task(SIZE, increment_io);
 	}
 
-	seq_copy.exec(in);
-	seq_copyless.exec(in);
+	seq_copy.set_input(in);
+	seq_copy.exec();
+	seq_copyless.set_input(in);
+	seq_copyless.exec();
 	//----------COPY-BENCH----------//
 	auto seq_start = seq_copy.timestamps[0];
 	auto seq_end = seq_copy.timestamps[seq_copy.timestamps.size()-1];
@@ -88,8 +110,8 @@ void tache(int size){
 	Socket *socket_4 = new Output(size);
 	//###Binding###//
 	socket_3->set_data(socket_2->get_data());
-	Task task_1(func_inc, socket_1, socket_2);
-	Task task_2(func_inc, socket_3, socket_4);
+	Task task_1(increment, socket_1, socket_2);
+	Task task_2(increment, socket_3, socket_4);
 	
 	//###Exec###//
 	task_1.exec();
@@ -113,8 +135,8 @@ void tache(int size){
 	Socket *socket_1_io = new InOut(size);
 	socket_1_io->set_data(in);
 	
-	Task task_1_io(func_inc, socket_1_io, socket_1_io);
-	Task task_2_io(func_inc, socket_1_io, socket_1_io);
+	Task_IO task_1_io(increment_io, socket_1_io);
+	Task_IO task_2_io(increment_io, socket_1_io);
 	task_1_io.exec();
 	task_2_io.exec();
 
@@ -151,16 +173,16 @@ void bench_tache(int size,std::ofstream& file){
 	Socket *socket_5 = new Input(size);
 	Socket *socket_6 = new Output(size);
 	socket_1->set_data(in); // Mise en place de l'entrée du programme
+	socket_3->set_data(socket_2->get_data());
+	socket_5->set_data(socket_4->get_data());
 	//###Binding###//
-	Task task_1(func_inc, socket_1, socket_2);
-	Task task_2(func_inc, socket_3, socket_4);
-	Task task_3(func_inc, socket_5, socket_6);
+	Task task_1(increment, socket_1, socket_2);
+	Task task_2(increment, socket_3, socket_4);
+	Task task_3(increment, socket_5, socket_6);
 	//###Exec###//
 	auto start = steady_clock::now();
 	task_1.exec();
-	socket_3->set_data(socket_2->get_data());
 	task_2.exec();
-	socket_5->set_data(socket_4->get_data());
 	task_3.exec();
 	auto end = steady_clock::now();
 	cout << "Temps de traitement total (Suite de Taches avec copie) : "<< duration_cast<microseconds>(end-start).count() << "ms" << endl;
@@ -169,9 +191,9 @@ void bench_tache(int size,std::ofstream& file){
 	Socket *socket_1_io = new InOut(size);
 	socket_1_io->set_data(in);
 	
-	Task task_1_io(func_inc, socket_1_io, socket_1_io);
-	Task task_2_io(func_inc, socket_1_io, socket_1_io);
-	Task task_3_io(func_inc, socket_1_io, socket_1_io);
+	Task_IO task_1_io(increment_io, socket_1_io);
+	Task_IO task_2_io(increment_io, socket_1_io);
+	Task_IO task_3_io(increment_io, socket_1_io);
 	
 	start = steady_clock::now();
 	task_1_io.exec();
@@ -202,6 +224,5 @@ int main(void){
 	sequence();
 	bench_tache(i, output_file);
 	bench_sequence(i);
-	
 	return 0;
 }

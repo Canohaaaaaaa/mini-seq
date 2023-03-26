@@ -21,12 +21,16 @@ class  Socket
 		return size;
 	}
 
-	void set_data(void *data){ // On essayera de donner à la socket un espace dépendant de la socket !!
+	void set_data(void *data){
 		this->data = data;
 	}
 
 	void *get_data(){
 		return data;
+	}
+
+	void **get_socket_data_addr(){
+		return &data;
 	}
 
 	void display(){
