@@ -14,29 +14,29 @@ class  Socket
 	size_t size;
 	public:
 	Socket() {}
-	Socket(size_t size) : size(size){} 
-	virtual ~Socket(){};
+	Socket(const size_t size) : size(size){} 
+	virtual ~Socket() {};
 
-	size_t get_size(){
+	size_t get_size() const {
 		return size;
 	}
 
-	void set_data(void *data){
+	void set_data(void *data) {
 		this->data = data;
 	}
 
-	void *get_data(){
+	void *get_data() const {
 		return data;
 	}
 
-	void **get_socket_data_addr(){
+	void **get_socket_data_addr() {
 		return &data;
 	}
 
-	void display(){
-		cout << "size :" << size << endl;
+	void display() {
+		cout << "size :" << size/sizeof(int) << endl;
 		int *int_array = (int*)data;
-		for(size_t i=0; i < size; i++){
+		for(size_t i=0; i < size/sizeof(int); i++){
 			cout << int_array[i] << endl;
 		}
 	}
@@ -44,8 +44,8 @@ class  Socket
 
 class Input : public Socket {
 	public : 
-	Input(size_t size) : Socket(size){}
-	Input(size_t size, void *data){
+	Input(const size_t size) : Socket(size) {}
+	Input(const size_t size, void *data) {
 		this->size = size;
 		this->data = data;
 	} 
@@ -55,10 +55,10 @@ class Input : public Socket {
 
 class Output : public Socket {
 	public : 
-	Output(size_t size) : Socket(size){
-		data = malloc(size*sizeof(int));
+	Output(const size_t size) : Socket(size) {
+		data = malloc(size);
 	}
-	~Output(){
+	~Output() {
 		free(data);
 	}
 };
@@ -66,13 +66,15 @@ class Output : public Socket {
 class InOut : public Socket{
 	bool alloced = false;
 	public : 
-	InOut(size_t size) : Socket(size){}
-	~InOut(){
+	InOut(const size_t size) : Socket(size) {}
+	~InOut() {
 		if(alloced)
 			free(data);
 	}
 
-	void alloc(){ //Les output sockets
-		data = malloc(size*sizeof(int)); // On suppose travailler avec des entiers pour cette version 
+	// Si un socket IO est le premier de la sequence, il doit allouer
+	void alloc() {
+		data = malloc(size);
+		alloced = true;
 	}
 };

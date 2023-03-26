@@ -4,24 +4,28 @@
 #include <fstream>
 #include "Task.hh"
 #include "Sequence.hh"
-#define SIZE 10000000
-#define SIZE_SEQ 100000
-#define DETAIL true
+#define SIZE 10
+#define SIZE_SEQ 10
+#define DETAIL false
 
 using namespace std::chrono;
 using std::function, std::vector;
 
-void increment(size_t size_in, void *in_data, size_t size_out, void *out_data){
-	int * in_int_array = (int*)in_data;
-	int * out_int_array = (int*)out_data;
-	for(size_t i=0; i < size_in; i++){
+void increment(const size_t size_in, const void *in_data, const size_t size_out, void *out_data) {
+	const int *in_int_array = (int*)in_data;
+	// Ici les size_in/out sont des nombres d'octets, a moins d'ecrire des chars on ne veut idealement pas iterer dessus
+	size_t in_array_size = size_in / sizeof(int);
+	int *out_int_array = (int*)out_data;
+	size_t out_array_size = size_out / sizeof(int);
+	for(size_t i=0; i < in_array_size && i < out_array_size; i++){
 		out_int_array[i] = in_int_array[i] + 1;
 	}
 }
 
-void increment_io(size_t size_in, void *data){
+void increment_io(const size_t size_in, void *data) {
 	int * in_int_array = (int*)data;
-	for(size_t i=0; i < size_in; i++){
+	int in_array_size = size_in / sizeof(int);
+	for(size_t i=0; i < in_array_size; i++){
 		in_int_array[i] = in_int_array[i] + 1;
 	}
 }
@@ -29,33 +33,28 @@ void increment_io(size_t size_in, void *data){
 void sequence(){
 	Sequence seq;
 	Sequence seq_io;
-	seq.add_task(SIZE, SIZE, increment);
-	seq.add_task(SIZE, SIZE, increment);
-	seq.add_task(SIZE, SIZE, increment);
+	seq.add_task(SIZE * sizeof(int), SIZE * sizeof(int), increment);
+	seq.add_task(SIZE * sizeof(int), SIZE * sizeof(int), increment);
+	seq.add_task(SIZE * sizeof(int), SIZE * sizeof(int), increment);
 
-	seq_io.add_task(SIZE, increment_io);
-	seq_io.add_task(SIZE, SIZE, increment);
-	seq_io.add_task(SIZE, increment_io);
-	seq_io.add_task(SIZE, increment_io);
-	seq_io.add_task(SIZE, SIZE, increment);
-	seq_io.add_task(SIZE, increment_io);
-	seq_io.add_task(SIZE, increment_io);
-	seq_io.add_task(SIZE, SIZE, increment);
-	seq_io.add_task(SIZE, increment_io);
+	seq_io.add_task(SIZE* sizeof(int),                  increment_io);
+	seq_io.add_task(SIZE* sizeof(int), SIZE * sizeof(int), increment);
+	seq_io.add_task(SIZE* sizeof(int),                  increment_io);
+	seq_io.add_task(SIZE* sizeof(int), SIZE * sizeof(int), increment);
 
 	int *in = (int*)malloc(sizeof(int) * SIZE);
 	for(int i = 0; i < SIZE; i++){
 		in[i] = i; 
 	}
 	
-	seq.set_input(in);
+	seq.set_input(in, sizeof(int) * SIZE);
 	seq.exec();
-	seq_io.set_input(in);
+	seq_io.set_input(in, sizeof(int) * SIZE);
 	seq_io.exec();
 	free(in);
 }
 
-void bench_sequence(int size_seq){
+void bench_sequence(){
 	#ifndef BENCH
 	return;
 	#endif
@@ -65,14 +64,14 @@ void bench_sequence(int size_seq){
 	}
 	Sequence seq_copy;
 	Sequence seq_copyless;
-	for(int i=0; i < size_seq; i++){
-		seq_copy.add_task(SIZE, SIZE, increment);
-		seq_copyless.add_task(SIZE, increment_io);
+	for(int i=0; i < SIZE_SEQ; i++){
+		seq_copy.add_task(SIZE * sizeof(int), SIZE * sizeof(int), increment);
+		seq_copyless.add_task(SIZE * sizeof(int), increment_io);
 	}
 
-	seq_copy.set_input(in);
+	seq_copy.set_input(in, sizeof(int) * SIZE);
 	seq_copy.exec();
-	seq_copyless.set_input(in);
+	seq_copyless.set_input(in, sizeof(int) * SIZE);
 	seq_copyless.exec();
 	//----------COPY-BENCH----------//
 	auto seq_start = seq_copy.timestamps[0];
@@ -95,19 +94,16 @@ void bench_sequence(int size_seq){
 	free(in);
 }
 
-void tache(int size){
-	int *in = (int*)malloc(sizeof(int) * size);
-	for(int i = 0; i < size; i++){
+void tache() {
+	int *in = (int*)malloc(SIZE * sizeof(int));
+	for(int i = 0; i < SIZE ; i++){
 		in[i] = i;
 	}
-
-
-
 	//###Sockets###//
-	Socket *socket_1 = new Input(size, in);
-	Socket *socket_2 = new Output(size);
-	Socket *socket_3 = new Input(size);
-	Socket *socket_4 = new Output(size);
+	Socket *socket_1 = new Input(SIZE * sizeof(int), in);
+	Socket *socket_2 = new Output(SIZE * sizeof(int));
+	Socket *socket_3 = new Input(SIZE * sizeof(int));
+	Socket *socket_4 = new Output(SIZE * sizeof(int));
 	//###Binding###//
 	socket_3->set_data(socket_2->get_data());
 	Task task_1(increment, socket_1, socket_2);
@@ -132,7 +128,7 @@ void tache(int size){
 	}
 
 	//###Version InOut###//
-	Socket *socket_1_io = new InOut(size);
+	Socket *socket_1_io = new InOut(SIZE * sizeof(int));
 	socket_1_io->set_data(in);
 	
 	Task_IO task_1_io(increment_io, socket_1_io);
@@ -219,10 +215,10 @@ int main(void){
 	std::ofstream output_file;
 	output_file.open("evolution_sequence_size_seq.dat",std::ios::trunc);
 	//cout << "ouverture du fichier" << endl;
-	int i= 10;
-	tache(i);
+	int i = 10;
+	tache();
 	sequence();
-	bench_tache(i, output_file);
-	bench_sequence(i);
+	bench_tache(i * sizeof(int), output_file);
+	bench_sequence();
 	return 0;
 }
