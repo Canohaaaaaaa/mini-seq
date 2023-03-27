@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 sns.set_theme(style="ticks")
 
 # Load the example dataset for Anscombe's quartet
-df = pd.read_csv("sequence_with_copy.csv")
+df = pd.read_csv("data.csv")
 print(df)
 
 

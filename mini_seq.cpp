@@ -4,10 +4,9 @@
 #include <fstream>
 #include "Task.hh"
 #include "Sequence.hh"
-#define SIZE 1000
+#define SIZE 2048
 #define SIZE_SEQ 10
 #define DETAIL false
-#define BENCH 1 
 
 using namespace std::chrono;
 using std::function, std::vector;
@@ -18,7 +17,7 @@ void increment(const size_t size_in, const void *in_data, const size_t size_out,
 	size_t in_array_size = size_in / sizeof(int);
 	int *out_int_array = (int*)out_data;
 	size_t out_array_size = size_out / sizeof(int);
-	for(size_t i=0; i < in_array_size && i < out_array_size; i++){
+	for(size_t i=0; i < in_array_size; i++){
 		out_int_array[i] = in_int_array[i] + 1;
 	}
 }
@@ -31,7 +30,24 @@ void increment_io(const size_t size_in, void *data) {
 	}
 }
 
-void sequence(){
+void increment_uint8(const size_t size_in, const void *in_data, const size_t size_out, void *out_data) {
+	const uint8_t *in_int_array = (uint8_t*)in_data;
+	size_t in_array_size = size_in / sizeof(uint8_t);
+	uint8_t *out_int_array = (uint8_t*)out_data;
+	for(size_t i=0; i < in_array_size; i++){
+		out_int_array[i] = in_int_array[i] + 1;
+	}
+}
+
+void increment_io_uint8(const size_t size_in, void *data) {
+	uint8_t * in_int_array = (uint8_t*)data;
+	uint8_t in_array_size = size_in / sizeof(uint8_t);
+	for(uint8_t i=0; i < in_array_size; i++){
+		in_int_array[i] = in_int_array[i] + 1;
+	}
+}
+
+void sequence() {
 	Sequence seq;
 	Sequence seq_io;
 	seq.add_task(SIZE * sizeof(int), SIZE * sizeof(int), increment);
@@ -55,22 +71,21 @@ void sequence(){
 	free(in);
 }
 
-void bench_sequence(int size_seq,std::ofstream& file){
+void bench_sequence() {
 	#ifndef BENCH
 	return;
 	#endif
 	int *in = (int*)malloc(sizeof(int) * SIZE);
-	for(int i = 0; i < SIZE; i++){
+	for(size_t i = 0; i < SIZE; i++){
 		in[i] = i; 
 	}
 	Sequence seq_copy;
 	Sequence seq_copyless;
 
-	for(int i=0; i < size_seq; i++){
+	for(int i=0; i < SIZE_SEQ; i++){
 		seq_copy.add_task(SIZE * sizeof(int), SIZE * sizeof(int), increment);
 		seq_copyless.add_task(SIZE * sizeof(int), increment_io);
 	}
-	file << size_seq << ",";
 	seq_copy.set_input(in, sizeof(int) * SIZE);
 	seq_copy.exec();
 	seq_copyless.set_input(in, sizeof(int) * SIZE);
@@ -80,19 +95,41 @@ void bench_sequence(int size_seq,std::ofstream& file){
 	auto seq_end = seq_copy.timestamps[seq_copy.timestamps.size()-1];
 	for(size_t i=1; i < seq_copy.timestamps.size() && DETAIL; i++){
 		auto time_taken = seq_copy.timestamps[i] - seq_copy.timestamps[i-1];
-		//cout << "Temps de traitement de la tache "<< i << " (Sequence avec copie) : " << duration_cast<microseconds>(time_taken).count() << "ms" << endl;
 	}
-	//cout << "Temps total (Sequence avec copie) : " << duration_cast<microseconds>(seq_end-seq_start).count() << "ms" << endl;
-	file << duration_cast<microseconds>(seq_end-seq_start).count() << ",";
+	cout << "Temps total (Sequence avec copie) : " << duration_cast<microseconds>(seq_end-seq_start).count() << "ms" << endl;
 	//----------COPYLESS-BENCH----------//
 	seq_start = seq_copyless.timestamps[0];
 	seq_end = seq_copyless.timestamps[seq_copyless.timestamps.size()-1];
 	for(size_t i=1; i < seq_copyless.timestamps.size() && DETAIL; i++){
 		auto time_taken = seq_copyless.timestamps[i] - seq_copyless.timestamps[i-1];
-		//cout << "Temps de traitement de la tache "<< i << " (Sequence sans copie) : " << duration_cast<microseconds>(time_taken).count() << "ms" << endl;
 	}
-	//cout << "Temps total (Sequence sans copie) : " << duration_cast<microseconds>(seq_end-seq_start).count() << "ms" << endl;
-	file <<  duration_cast<microseconds>(seq_end-seq_start).count()<< endl;
+	cout << "Temps total (Sequence sans copie) : " << duration_cast<microseconds>(seq_end-seq_start).count() << "ms" << endl;
+	free(in);
+}
+
+void output_bench_sequence(int size_seq,std::ofstream& file){
+	uint8_t *in = (uint8_t*)malloc(sizeof(char) * SIZE);
+	for(size_t i = 0; i < SIZE; i++){
+		in[i] = i; 
+	}
+	Sequence seq_copy;
+	Sequence seq_copyless;
+
+	for(int i=0; i < size_seq; i++){
+		seq_copy.add_task(SIZE * sizeof(char), SIZE * sizeof(char), increment_uint8);
+		seq_copyless.add_task(SIZE * sizeof(char), increment_io_uint8);
+	}
+	file << size_seq << ",";
+	seq_copy.set_input(in, sizeof(char) * SIZE);
+	auto copy_start = steady_clock::now();
+	seq_copy.exec();
+	auto copy_end = steady_clock::now();
+	seq_copyless.set_input(in, sizeof(char) * SIZE);
+	auto copyless_start = steady_clock::now();
+	seq_copyless.exec();
+	auto copyless_end = steady_clock::now();
+	file << duration_cast<microseconds>(copy_end-copy_start).count() << ",";
+	file <<  duration_cast<microseconds>(copyless_end-copyless_start).count()<< endl;
 	free(in);
 }
 
@@ -117,13 +154,13 @@ void tache() {
 	if(DETAIL){
 		cout << "Sortie tache 1 (avec copie) [";
 		int *int_array = (int*)socket_2->get_data();
-		for(size_t i=0; i < socket_2->get_size(); i++, i < socket_2->get_size() && cout << ","){ //Illisible
+		for(size_t i=0; i < socket_2->get_size() / sizeof(int); i++, i < socket_2->get_size() / sizeof(int) && cout << ","){ //Illisible
 			cout << int_array[i];
 		}
 		cout << "]" <<endl;
 		cout << "Sortie tache 2 (avec copie) [";
 		int_array = (int*)socket_4->get_data();
-		for(size_t i=0; i < socket_2->get_size(); i++, i < socket_4->get_size() && cout << ","){
+		for(size_t i=0; i < socket_2->get_size() / sizeof(int); i++, i < socket_4->get_size() / sizeof(int) && cout << ","){
 			cout << int_array[i];
 		}
 		cout << "]" <<endl;
@@ -141,7 +178,7 @@ void tache() {
 	if(DETAIL){
 		cout << "Sortie taches (sans copie) [";
 		int* int_array = (int*)socket_1_io->get_data();
-		for(size_t i=0; i < socket_1_io->get_size(); i++, i < socket_1_io->get_size() && cout << ","){ //Illisible
+		for(size_t i=0; i < socket_1_io->get_size() / sizeof(int); i++, i < socket_1_io->get_size() / sizeof(int) && cout << ","){ //Illisible
 			cout << int_array[i];
 		}
 		cout << "]" <<endl;
@@ -155,21 +192,21 @@ void tache() {
 	delete socket_1_io;
 }
 
-void bench_tache(int size,std::ofstream& file){
+void bench_tache() {
 	#ifndef BENCH
 	return;
 	#endif
-	int *in = (int*)malloc(sizeof(int) * size);
-	for(int i = 0; i < size; i++){
+	int *in = (int*)malloc(sizeof(int) * SIZE);
+	for(int i = 0; i < SIZE; i++){
 		in[i] = i; 
 	}
 	//###Sockets###//
-	Socket *socket_1 = new Input(size);
-	Socket *socket_2 = new Output(size);
-	Socket *socket_3 = new Input(size);
-	Socket *socket_4 = new Output(size);
-	Socket *socket_5 = new Input(size);
-	Socket *socket_6 = new Output(size);
+	Socket *socket_1 = new Input(SIZE * sizeof(int));
+	Socket *socket_2 = new Output(SIZE * sizeof(int));
+	Socket *socket_3 = new Input(SIZE * sizeof(int));
+	Socket *socket_4 = new Output(SIZE * sizeof(int));
+	Socket *socket_5 = new Input(SIZE * sizeof(int));
+	Socket *socket_6 = new Output(SIZE * sizeof(int));
 	socket_1->set_data(in); // Mise en place de l'entrée du programme
 	socket_3->set_data(socket_2->get_data());
 	socket_5->set_data(socket_4->get_data());
@@ -184,9 +221,8 @@ void bench_tache(int size,std::ofstream& file){
 	task_3.exec();
 	auto end = steady_clock::now();
 	cout << "Temps de traitement total (Suite de Taches avec copie) : "<< duration_cast<microseconds>(end-start).count() << "ms" << endl;
-	//file << duration_cast<microseconds>(end-start).count() << "\t";
 	//###Version InOut###//
-	Socket *socket_1_io = new InOut(size);
+	Socket *socket_1_io = new InOut(SIZE * sizeof(int));
 	socket_1_io->set_data(in);
 	
 	Task_IO task_1_io(increment_io, socket_1_io);
@@ -201,7 +237,6 @@ void bench_tache(int size,std::ofstream& file){
 
 
 	cout << "Temps de traitement total (Suite de Taches sans copie) : "<< duration_cast<microseconds>(end-start).count() << "ms" << endl;
-	//file << duration_cast<microseconds>(end-start).count() << endl;
 	free(in);
 	delete socket_1;
 	delete socket_2;
@@ -213,16 +248,16 @@ void bench_tache(int size,std::ofstream& file){
 }
 
 int main(void){
-
 	std::ofstream output_file;
-	output_file.open("./donnee/sequence_with_copy.csv");
+	output_file.open("./donnee/data.csv");
 	//cout << "ouverture du fichier" << endl;
 	output_file << "seq_size,tempsCopy,tempsSansCopy\n";
 	for (int i=10;i<1000000;i=i*2){
-	//tache();
-	//sequence();
-	//bench_tache(i * sizeof(int), output_file);
-	bench_sequence(i,output_file);
+		output_bench_sequence(i, output_file);
 	}
+	tache();
+	sequence();
+	bench_tache();
+	bench_sequence();
 	return 0;
 }

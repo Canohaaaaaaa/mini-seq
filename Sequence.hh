@@ -78,17 +78,6 @@ class Sequence{
 	}
 
 	void exec() {
-		/* // Code debug
-		for(size_t i=0; i < sockets.size(); i++){
-			cout << "socket " << i << " InputDataAddr " <<  sockets[i].first->get_socket_data_addr() <<endl;
-			cout << "socket " << i << " OutputDataAddr " <<  sockets[i].second->get_socket_data_addr() <<endl;
-			cout << "socket " << i << " Input " <<  sockets[i].first->get_data() <<endl;
-			cout << "socket " << i << " Output " <<  sockets[i].second->get_data() <<endl;
-			cout << "Task" << i << " Input " << tasks[i]->get_input_data() << endl;
-			cout << "Task" << i << " output " << tasks[i]->get_output_data() << endl;
-			sockets[i].second->display();
-		}
-		*/
 		#ifdef BENCH
 		timestamps.push_back(steady_clock::now());
 		#endif
