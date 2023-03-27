@@ -5,6 +5,7 @@
 #include <chrono>
 #include "Task.hh"
 #include "Socket.hh"
+#define BENCH 1
 
 using namespace std::chrono;
 using std::vector, std::function;
