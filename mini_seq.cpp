@@ -4,9 +4,9 @@
 #include <fstream>
 #include "Task.hh"
 #include "Sequence.hh"
-#define SIZE 2048
-#define SIZE_SEQ 10
-#define DETAIL false
+#define SIZE 10
+#define SIZE_SEQ 50
+#define DETAIL true
 
 using namespace std::chrono;
 using std::function, std::vector;
@@ -71,10 +71,8 @@ void sequence() {
 	free(in);
 }
 
-void bench_sequence() {
-	#ifndef BENCH
-	return;
-	#endif
+void bench_sequence(int size_seq,std::ofstream& file) {
+	
 	int *in = (int*)malloc(sizeof(int) * SIZE);
 	for(size_t i = 0; i < SIZE; i++){
 		in[i] = i; 
@@ -82,54 +80,84 @@ void bench_sequence() {
 	Sequence seq_copy;
 	Sequence seq_copyless;
 
-	for(int i=0; i < SIZE_SEQ; i++){
+	for(int i=0; i < size_seq; i++){
 		seq_copy.add_task(SIZE * sizeof(int), SIZE * sizeof(int), increment);
 		seq_copyless.add_task(SIZE * sizeof(int), increment_io);
 	}
+
 	seq_copy.set_input(in, sizeof(int) * SIZE);
+
+	double moyenne_temps_copy = 0;
+	for (int j=0;j<10;j++){
+	auto copy_start = steady_clock::now();
 	seq_copy.exec();
+	auto copy_end = steady_clock::now();
+	moyenne_temps_copy += duration_cast<nanoseconds>(copy_end-copy_start).count() * 1e-6;
+	}
+
+
+
 	seq_copyless.set_input(in, sizeof(int) * SIZE);
+
+	double moyenne_temps_copy_less = 0;
+	for (int j=0; j<10;j++){
+	auto copyless_start = steady_clock::now();
 	seq_copyless.exec();
+	auto copyless_end = steady_clock::now();
+	moyenne_temps_copy_less += duration_cast<nanoseconds>(copyless_end-copyless_start).count() * 1e-6;
+	}
 	//----------COPY-BENCH----------//
-	auto seq_start = seq_copy.timestamps[0];
+	/*auto seq_start = seq_copy.timestamps[0];
 	auto seq_end = seq_copy.timestamps[seq_copy.timestamps.size()-1];
 	for(size_t i=1; i < seq_copy.timestamps.size() && DETAIL; i++){
 		auto time_taken = seq_copy.timestamps[i] - seq_copy.timestamps[i-1];
-	}
-	cout << "Temps total (Sequence avec copie) : " << duration_cast<microseconds>(seq_end-seq_start).count() << "ms" << endl;
+	}*/
+	file << moyenne_temps_copy/10 << ",";
 	//----------COPYLESS-BENCH----------//
-	seq_start = seq_copyless.timestamps[0];
+	/*seq_start = seq_copyless.timestamps[0];
 	seq_end = seq_copyless.timestamps[seq_copyless.timestamps.size()-1];
 	for(size_t i=1; i < seq_copyless.timestamps.size() && DETAIL; i++){
 		auto time_taken = seq_copyless.timestamps[i] - seq_copyless.timestamps[i-1];
-	}
-	cout << "Temps total (Sequence sans copie) : " << duration_cast<microseconds>(seq_end-seq_start).count() << "ms" << endl;
+	}*/
+	file << moyenne_temps_copy_less/10<< endl;
 	free(in);
 }
 
-void output_bench_sequence(int size_seq,std::ofstream& file){
-	uint8_t *in = (uint8_t*)malloc(sizeof(char) * SIZE);
-	for(size_t i = 0; i < SIZE; i++){
+void output_bench_sequence(int size,std::ofstream& file){
+	uint8_t *in = (uint8_t*)malloc(sizeof(char) * size);
+	for(size_t i = 0; i < size ; i++){
 		in[i] = i; 
 	}
 	Sequence seq_copy;
 	Sequence seq_copyless;
 
-	for(int i=0; i < size_seq; i++){
-		seq_copy.add_task(SIZE * sizeof(char), SIZE * sizeof(char), increment_uint8);
-		seq_copyless.add_task(SIZE * sizeof(char), increment_io_uint8);
+	for(int i=0; i < SIZE_SEQ; i++){
+		seq_copy.add_task(size * sizeof(char), size * sizeof(char), increment_uint8);
+		seq_copyless.add_task(size * sizeof(char), increment_io_uint8);
 	}
-	file << size_seq << ",";
-	seq_copy.set_input(in, sizeof(char) * SIZE);
+	file << size << ",";
+	seq_copy.set_input(in, sizeof(char) * size);
+
+	// Dénut du benchmark
+	//double moyenne_temps_copy = 0;
+	//for (int j=0;j<10;j++){
 	auto copy_start = steady_clock::now();
 	seq_copy.exec();
 	auto copy_end = steady_clock::now();
-	seq_copyless.set_input(in, sizeof(char) * SIZE);
+	//moyenne_temps_copy += duration_cast<nanoseconds>(copy_end-copy_start).count() * 1e-3;
+	//}
+
+	seq_copyless.set_input(in, sizeof(char) * size);
+
+	//double moyenne_temps_copy_less = 0;
+	//for (int j=0; j<10 ;j++){
 	auto copyless_start = steady_clock::now();
 	seq_copyless.exec();
 	auto copyless_end = steady_clock::now();
-	file << duration_cast<microseconds>(copy_end-copy_start).count() << ",";
-	file <<  duration_cast<microseconds>(copyless_end-copyless_start).count()<< endl;
+	//moyenne_temps_copy_less += duration_cast<nanoseconds>(copyless_end-copyless_start).count() * 1e-3;
+	//}
+	file << duration_cast<nanoseconds>(copy_end-copy_start).count() * 1e-3 << ",";
+	file << duration_cast<nanoseconds>(copyless_end-copyless_start).count() * 1e-3 << endl;
 	free(in);
 }
 
@@ -250,14 +278,16 @@ void bench_tache() {
 int main(void){
 	std::ofstream output_file;
 	output_file.open("./donnee/data.csv");
-	//cout << "ouverture du fichier" << endl;
-	output_file << "seq_size,tempsCopy,tempsSansCopy\n";
-	for (int i=10;i<1000000;i=i*2){
-		output_bench_sequence(i, output_file);
-	}
-	tache();
-	sequence();
+	cout << "ouverture du fichier" << endl;
+	output_file << "size,tempsCopy,tempsSansCopy\n";
+	for (int i=100;i<10000;i=i+100){
+		//output_bench_sequence(i, output_file);
+		output_file << i << ",";
+		bench_sequence(i,output_file);
+		}
+	/*tache();
+	/*sequence();
 	bench_tache();
-	bench_sequence();
+	bench_sequence();*/
 	return 0;
 }

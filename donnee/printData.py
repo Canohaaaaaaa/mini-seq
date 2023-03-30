@@ -4,13 +4,11 @@ import matplotlib.pyplot as plt
 sns.set_theme(style="ticks")
 
 # Load the example dataset for Anscombe's quartet
-df = pd.read_csv("data.csv")
-print(df)
-
-
-# Show the results of a linear regression within each dataset
-sns.lineplot(data=df,x="seq_size",y="tempsCopy")
-ax = sns.lineplot(data=df,x="seq_size",y="tempsSansCopy")
-ax.set(xlabel='taille sequence', ylabel="temps d'executon",title="Copy Vs CopyLess")
-ax.legend(loc="upper left")
+test = pd.read_csv("data.csv")
+test = test.set_index('size')
+print(test)
+#flights_wide.head()
+sns.lineplot(data=test)
 plt.show()
+# Show the results of a linear regression within each dataset
+#sns.relplot(data=df_wide,kind="line")
