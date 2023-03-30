@@ -4,8 +4,8 @@
 #include <fstream>
 #include "Task.hh"
 #include "Sequence.hh"
-#define SIZE 10
-#define SIZE_SEQ 50
+#define SIZE 100000
+#define SIZE_SEQ 6
 #define DETAIL true
 
 using namespace std::chrono;
@@ -71,71 +71,70 @@ void sequence() {
 	free(in);
 }
 
-void bench_sequence(int size_seq,std::ofstream& file) {
+void bench_sequence(int size,std::ofstream& file) {
 	
-	int *in = (int*)malloc(sizeof(int) * SIZE);
-	for(size_t i = 0; i < SIZE; i++){
-		in[i] = i; 
-	}
-	Sequence seq_copy;
-	Sequence seq_copyless;
-
-	for(int i=0; i < size_seq; i++){
-		seq_copy.add_task(SIZE * sizeof(int), SIZE * sizeof(int), increment);
-		seq_copyless.add_task(SIZE * sizeof(int), increment_io);
-	}
-
-	seq_copy.set_input(in, sizeof(int) * SIZE);
-
-	double moyenne_temps_copy = 0;
-	for (int j=0;j<10;j++){
-	auto copy_start = steady_clock::now();
-	seq_copy.exec();
-	auto copy_end = steady_clock::now();
-	moyenne_temps_copy += duration_cast<nanoseconds>(copy_end-copy_start).count() * 1e-6;
-	}
-
-
-
-	seq_copyless.set_input(in, sizeof(int) * SIZE);
-
-	double moyenne_temps_copy_less = 0;
-	for (int j=0; j<10;j++){
-	auto copyless_start = steady_clock::now();
-	seq_copyless.exec();
-	auto copyless_end = steady_clock::now();
-	moyenne_temps_copy_less += duration_cast<nanoseconds>(copyless_end-copyless_start).count() * 1e-6;
-	}
-	//----------COPY-BENCH----------//
-	/*auto seq_start = seq_copy.timestamps[0];
-	auto seq_end = seq_copy.timestamps[seq_copy.timestamps.size()-1];
-	for(size_t i=1; i < seq_copy.timestamps.size() && DETAIL; i++){
-		auto time_taken = seq_copy.timestamps[i] - seq_copy.timestamps[i-1];
-	}*/
-	file << moyenne_temps_copy/10 << ",";
-	//----------COPYLESS-BENCH----------//
-	/*seq_start = seq_copyless.timestamps[0];
-	seq_end = seq_copyless.timestamps[seq_copyless.timestamps.size()-1];
-	for(size_t i=1; i < seq_copyless.timestamps.size() && DETAIL; i++){
-		auto time_taken = seq_copyless.timestamps[i] - seq_copyless.timestamps[i-1];
-	}*/
-	file << moyenne_temps_copy_less/10<< endl;
-	free(in);
-}
-
-void output_bench_sequence(int size,std::ofstream& file){
-	uint8_t *in = (uint8_t*)malloc(sizeof(char) * size);
-	for(size_t i = 0; i < size ; i++){
+	int *in = (int*)malloc(sizeof(int) * size);
+	for(size_t i = 0; i < size; i++){
 		in[i] = i; 
 	}
 	Sequence seq_copy;
 	Sequence seq_copyless;
 
 	for(int i=0; i < SIZE_SEQ; i++){
-		seq_copy.add_task(size * sizeof(char), size * sizeof(char), increment_uint8);
-		seq_copyless.add_task(size * sizeof(char), increment_io_uint8);
+		seq_copy.add_task(size * sizeof(int), size * sizeof(int), increment);
+		seq_copyless.add_task(size * sizeof(int), increment_io);
 	}
-	file << size << ",";
+
+	seq_copy.set_input(in, sizeof(int) * size);
+
+	double moyenne_temps_copy = 0;
+	
+	auto copy_start = steady_clock::now();
+	seq_copy.exec();
+	auto copy_end = steady_clock::now();
+	moyenne_temps_copy += duration_cast<nanoseconds>(copy_end-copy_start).count() * 1e-6;
+	
+
+
+
+	seq_copyless.set_input(in, sizeof(int) * size);
+
+	double moyenne_temps_copy_less = 0;
+	auto copyless_start = steady_clock::now();
+	seq_copyless.exec();
+	auto copyless_end = steady_clock::now();
+	moyenne_temps_copy_less += duration_cast<nanoseconds>(copyless_end-copyless_start).count() * 1e-6;
+	
+	
+	//----------COPY-BENCH----------//
+	/*auto seq_start = seq_copy.timestamps[0];
+	auto seq_end = seq_copy.timestamps[seq_copy.timestamps.size()-1];
+	for(size_t i=1; i < seq_copy.timestamps.size() && DETAIL; i++){
+		auto time_taken = seq_copy.timestamps[i] - seq_copy.timestamps[i-1];
+	}*/
+	file << moyenne_temps_copy/1 << ",";
+	//----------COPYLESS-BENCH----------//
+	/*seq_start = seq_copyless.timestamps[0];
+	seq_end = seq_copyless.timestamps[seq_copyless.timestamps.size()-1];
+	for(size_t i=1; i < seq_copyless.timestamps.size() && DETAIL; i++){
+		auto time_taken = seq_copyless.timestamps[i] - seq_copyless.timestamps[i-1];
+	}*/
+	file << moyenne_temps_copy_less/1<< endl;
+	free(in);
+}
+
+void output_bench_sequence(int size,std::ofstream& file){
+	uint8_t *in = (uint8_t*)malloc(sizeof(char) *SIZE);
+	for(size_t i = 0; i < size ; i++){
+		in[i] = i; 
+	}
+	/*Sequence seq_copy;
+	Sequence seq_copyless;
+	/*for(int i=0; i < SIZE_SEQ; i++){
+		seq_copy.add_task(size * sizeof(char), size * sizeof(char), increment_uint8);
+		seq_copyless.add_task(size * sizeof(char), increment_seq_copy.set_input(in, sizeof(int) * size);io_uint8);
+	}
+	file << size<< ",";
 	seq_copy.set_input(in, sizeof(char) * size);
 
 	// Dénut du benchmark
@@ -146,7 +145,7 @@ void output_bench_sequence(int size,std::ofstream& file){
 	auto copy_end = steady_clock::now();
 	//moyenne_temps_copy += duration_cast<nanoseconds>(copy_end-copy_start).count() * 1e-3;
 	//}
-
+	
 	seq_copyless.set_input(in, sizeof(char) * size);
 
 	//double moyenne_temps_copy_less = 0;
@@ -157,7 +156,52 @@ void output_bench_sequence(int size,std::ofstream& file){
 	//moyenne_temps_copy_less += duration_cast<nanoseconds>(copyless_end-copyless_start).count() * 1e-3;
 	//}
 	file << duration_cast<nanoseconds>(copy_end-copy_start).count() * 1e-3 << ",";
-	file << duration_cast<nanoseconds>(copyless_end-copyless_start).count() * 1e-3 << endl;
+	file <<duration_cast<nanoseconds>(copyless_end-copyless_start).count() * 1e-3 << endl;*/
+
+	Sequence seq_hybrid;
+	Sequence seq_homogene;
+	
+
+	seq_homogene.add_task(SIZE * sizeof(char), SIZE * sizeof(char), increment_uint8);
+	seq_homogene.add_task(SIZE * sizeof(char), SIZE * sizeof(char), increment_uint8);
+	seq_homogene.add_task(SIZE * sizeof(char), SIZE * sizeof(char), increment_uint8);
+	seq_homogene.add_task(SIZE * sizeof(char), SIZE * sizeof(char), increment_uint8);
+	seq_homogene.add_task(SIZE * sizeof(char), SIZE * sizeof(char), increment_uint8);
+	seq_homogene.add_task(SIZE * sizeof(char), SIZE * sizeof(char), increment_uint8);
+	seq_homogene.add_task(SIZE * sizeof(char), SIZE * sizeof(char), increment_uint8);
+	seq_homogene.add_task(SIZE * sizeof(char), SIZE * sizeof(char), increment_uint8);
+	seq_homogene.add_task(SIZE * sizeof(char), SIZE * sizeof(char), increment_uint8);
+	seq_homogene.add_task(SIZE * sizeof(char), SIZE * sizeof(char), increment_uint8);
+
+
+	seq_hybrid.add_task(SIZE * sizeof(char), SIZE * sizeof(char), increment_uint8);
+	seq_hybrid.add_task(SIZE * sizeof(char), SIZE * sizeof(char), increment_uint8);
+	seq_hybrid.add_task(SIZE * sizeof(char), increment_io_uint8);
+	seq_hybrid.add_task(SIZE * sizeof(char), increment_io_uint8);
+	seq_hybrid.add_task(SIZE * sizeof(char), increment_io_uint8);
+	seq_hybrid.add_task(SIZE * sizeof(char), increment_io_uint8);
+	seq_hybrid.add_task(SIZE * sizeof(char), increment_io_uint8);
+	seq_hybrid.add_task(SIZE * sizeof(char), increment_io_uint8);
+	seq_hybrid.add_task(SIZE * sizeof(char), SIZE * sizeof(char), increment_uint8);
+	seq_hybrid.add_task(SIZE * sizeof(char), SIZE * sizeof(char), increment_uint8);
+
+	seq_homogene.set_input(in, sizeof(int) * size);
+	seq_hybrid.set_input(in, sizeof(int) * size);
+
+	seq_homogene.exec();
+	seq_hybrid.exec();
+
+
+	//## Bench de la sequence homogène##//
+
+	
+	for(size_t i=1; i < seq_homogene.timestamps.size() && DETAIL; i++){
+
+		auto time_taken_homo= seq_homogene.timestamps[i] - seq_homogene.timestamps[i-1];
+		auto time_taken_hyb = seq_hybrid.timestamps[i] - seq_hybrid.timestamps[i-1];
+		file << i << "," << duration_cast<nanoseconds>(time_taken_homo).count() * 1e-3<<","<<duration_cast<nanoseconds>(time_taken_hyb).count() * 1e-3<<endl;
+	}
+
 	free(in);
 }
 
@@ -277,17 +321,19 @@ void bench_tache() {
 
 int main(void){
 	std::ofstream output_file;
-	output_file.open("./donnee/data.csv");
+	output_file.open("./donnee/compare_hyb_homo.csv");
 	cout << "ouverture du fichier" << endl;
-	output_file << "size,tempsCopy,tempsSansCopy\n";
-	for (int i=100;i<10000;i=i+100){
+	output_file << "tache,tempsHomo,tempsHyb\n";
+	int i=0;
+	/*for (int i=100;i<1000000;i=i*2){
 		//output_bench_sequence(i, output_file);
 		output_file << i << ",";
 		bench_sequence(i,output_file);
-		}
-	/*tache();
-	/*sequence();
-	bench_tache();
-	bench_sequence();*/
+		}*/
+	output_bench_sequence(i, output_file);
+	//tache();
+	//sequence();
+	//bench_tache();
+	//bench_sequence();
 	return 0;
 }

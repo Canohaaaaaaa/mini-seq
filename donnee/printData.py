@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 sns.set_theme(style="ticks")
 
 # Load the example dataset for Anscombe's quartet
-test = pd.read_csv("data.csv")
-test = test.set_index('size')
+test = pd.read_csv("compare_hyb_homo.csv")
+test = test.set_index('tache')
 print(test)
 #flights_wide.head()
 sns.lineplot(data=test)
