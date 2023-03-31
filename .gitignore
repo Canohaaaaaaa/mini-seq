@@ -41,3 +41,5 @@
 *.app
 
 .vscode
+
+data/.~lock.data.csv#

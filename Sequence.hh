@@ -79,6 +79,7 @@ class Sequence{
 
 	void exec() {
 		#ifdef BENCH
+		timestamps.clear();
 		timestamps.push_back(steady_clock::now());
 		#endif
 		for(size_t i=0; i < tasks.size(); i++){

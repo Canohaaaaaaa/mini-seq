@@ -2,50 +2,15 @@
 #include <iostream>
 #include <chrono>
 #include <fstream>
+#include <cassert>
 #include "Task.hh"
 #include "Sequence.hh"
-#define SIZE 100000
+#define SIZE 2048
 #define SIZE_SEQ 6
-#define DETAIL true
+#define DETAIL false
 
 using namespace std::chrono;
 using std::function, std::vector;
-
-void increment(const size_t size_in, const void *in_data, const size_t size_out, void *out_data) {
-	const int *in_int_array = (int*)in_data;
-	// Ici les size_in/out sont des nombres d'octets, a moins d'ecrire des chars on ne veut idealement pas iterer dessus
-	size_t in_array_size = size_in / sizeof(int);
-	int *out_int_array = (int*)out_data;
-	size_t out_array_size = size_out / sizeof(int);
-	for(size_t i=0; i < in_array_size; i++){
-		out_int_array[i] = in_int_array[i] + 1;
-	}
-}
-
-void increment_io(const size_t size_in, void *data) {
-	int * in_int_array = (int*)data;
-	int in_array_size = size_in / sizeof(int);
-	for(int i=0; i < in_array_size; i++){
-		in_int_array[i] = in_int_array[i] + 1;
-	}
-}
-
-void increment_uint8(const size_t size_in, const void *in_data, const size_t size_out, void *out_data) {
-	const uint8_t *in_int_array = (uint8_t*)in_data;
-	size_t in_array_size = size_in / sizeof(uint8_t);
-	uint8_t *out_int_array = (uint8_t*)out_data;
-	for(size_t i=0; i < in_array_size; i++){
-		out_int_array[i] = in_int_array[i] + 1;
-	}
-}
-
-void increment_io_uint8(const size_t size_in, void *data) {
-	uint8_t * in_int_array = (uint8_t*)data;
-	uint8_t in_array_size = size_in / sizeof(uint8_t);
-	for(uint8_t i=0; i < in_array_size; i++){
-		in_int_array[i] = in_int_array[i] + 1;
-	}
-}
 
 void sequence() {
 	Sequence seq;
@@ -71,119 +36,39 @@ void sequence() {
 	free(in);
 }
 
-void bench_sequence(int size,std::ofstream& file) {
-	
-	int *in = (int*)malloc(sizeof(int) * size);
-	for(size_t i = 0; i < size; i++){
+void bench_sequence() {
+	#ifndef BENCH
+	return;
+	#endif
+	uint8_t *in = (uint8_t*)malloc(sizeof(char) * SIZE);
+	for(size_t i = 0; i < SIZE; i++){
 		in[i] = i; 
 	}
 	Sequence seq_copy;
 	Sequence seq_copyless;
 
 	for(int i=0; i < SIZE_SEQ; i++){
-		seq_copy.add_task(size * sizeof(int), size * sizeof(int), increment);
-		seq_copyless.add_task(size * sizeof(int), increment_io);
+		seq_copy.add_task(SIZE * sizeof(char), SIZE * sizeof(char), increment);
+		seq_copyless.add_task(SIZE * sizeof(char), increment_io);
 	}
-
-	seq_copy.set_input(in, sizeof(int) * size);
-	seq_copyless.set_input(in, sizeof(int) * size);
-
-	double moyenne_temps_copy = 0;
-	
-	auto copy_start = steady_clock::now();
+	seq_copy.set_input(in, sizeof(char) * SIZE);
+	seq_copyless.set_input(in, sizeof(char) * SIZE);
 	seq_copy.exec();
-	auto copy_end = steady_clock::now();
-	moyenne_temps_copy += duration_cast<nanoseconds>(copy_end-copy_start).count() * 1e-6;
-	
-
-
-
-	
-
-	double moyenne_temps_copy_less = 0;
-	auto copyless_start = steady_clock::now();
 	seq_copyless.exec();
-	auto copyless_end = steady_clock::now();
-	moyenne_temps_copy_less += duration_cast<nanoseconds>(copyless_end-copyless_start).count() * 1e-6;
-	
-	
 	//----------COPY-BENCH----------//
-	/*auto seq_start = seq_copy.timestamps[0];
+	auto seq_start = seq_copy.timestamps[0];
 	auto seq_end = seq_copy.timestamps[seq_copy.timestamps.size()-1];
 	for(size_t i=1; i < seq_copy.timestamps.size() && DETAIL; i++){
 		auto time_taken = seq_copy.timestamps[i] - seq_copy.timestamps[i-1];
 	}
-	file << moyenne_temps_copy/1 << ",";
+	cout << "Temps total (Sequence avec copie) : " << duration_cast<nanoseconds>(seq_copy.timestamps.back()-seq_copy.timestamps.front()).count() / 1000.f / 1000.f << "ms" << endl;
 	//----------COPYLESS-BENCH----------//
-	/*seq_start = seq_copyless.timestamps[0];
+	seq_start = seq_copyless.timestamps[0];
 	seq_end = seq_copyless.timestamps[seq_copyless.timestamps.size()-1];
 	for(size_t i=1; i < seq_copyless.timestamps.size() && DETAIL; i++){
 		auto time_taken = seq_copyless.timestamps[i] - seq_copyless.timestamps[i-1];
-	}*/
-	//file << moyenne_temps_copy << ",";
-	cout << moyenne_temps_copy_less<< endl;
-	free(in);
-}
-
-void output_bench_sequence(int size,std::ofstream& file){
-	
-	uint8_t *in = (uint8_t*)malloc(sizeof(char) *size);
-
-	for(size_t i = 0; i < size ; i++){
-		in[i] = i; 
 	}
-	Sequence seq_copy;
-	Sequence seq_copyless;
-
-	for(int i=0; i < SIZE_SEQ; i++){
-		seq_copy.add_task(size * sizeof(char), size * sizeof(char), increment_uint8);
-		seq_copyless.add_task(size * sizeof(char), increment_io_uint8);
-	}
-	seq_copy.set_input(in, sizeof(char) * size);
-	seq_copyless.set_input(in, sizeof(char) * size);
-
-	// Dénut du benchmark
-	//double moyenne_temps_copy = 0;
-	//for (int j=0;j<10;j++){
-		auto copy_start = steady_clock::now();
-		seq_copy.exec();
-		auto copy_end = steady_clock::now();
-		//moyenne_temps_copy += duration_cast<nanoseconds>(copy_end-copy_start).count() * 1e-3;
-	//}
-	
-	
-
-	//double moyenne_temps_copy_less = 0;
-	//for (int j=0; j<10;j++){
-		auto copyless_start = steady_clock::now();
-		seq_copyless.exec();
-		auto copyless_end = steady_clock::now();
-		//moyenne_temps_copy_less += duration_cast<nanoseconds>(copyless_end-copyless_start).count() * 1e-3;
-	//}
-	file << duration_cast<nanoseconds>(copy_end-copy_start).count() * 1e-3 << ",";
-	file << duration_cast<nanoseconds>(copyless_end-copyless_start).count() * 1e-3 << endl;
-
-	/*Sequence seq_hybrid;
-	Sequence seq_homogene;
-	
-
-	seq_homogene.add_task(SIZE * sizeof(char), SIZE * sizeof(char), increment_uint8);
-	seq_homogene.add_task(SIZE * sizeof(char), SIZE * sizeof(char), increment_uint8);
-	seq_homogene.add_task(SIZE * sizeof(char), SIZE * sizeof(char), increment_uint8);
-	seq_homogene.add_task(SIZE * sizeof(char), SIZE * sizeof(char), increment_uint8);
-	seq_homogene.add_task(SIZE * sizeof(char), SIZE * sizeof(char), increment_uint8);
-	seq_homogene.add_task(SIZE * sizeof(char), SIZE * sizeof(char), increment_uint8);
-	
-	seq_homogene.set_input(in, sizeof(char) * SIZE);
-	//seq_hybrid.set_input(in, sizeof(char) * SIZE);
-
-	seq_homogene.exec();
-	//seq_hybrid.exec();
-
-
-	//## Bench de la sequence homogène##//
-	
-	cout << duration_cast<nanoseconds>(seq_homogene.timestamps[seq_homogene.timestamps.size()-1] - seq_homogene.timestamps[1] ).count() * 1e-3;*/
+	cout << "Temps total (Sequence sans copie) : " << duration_cast<nanoseconds>(seq_copyless.timestamps.back()-seq_copyless.timestamps.front()).count() / 1000.f / 1000.f << "ms" << endl;
 	free(in);
 }
 
@@ -301,19 +186,51 @@ void bench_tache() {
 	delete socket_1_io;
 }
 
+void unit_test() {
+	int *in_int = (int*)malloc(sizeof(int) * SIZE);
+	for(int i = 0; i < SIZE; i++){
+		in_int[i] = i; 
+	}
+
+	Sequence seq_int, seq_io_int, seq_hyb_int;
+
+	for(int i=0; i < SIZE_SEQ; i++) {
+		seq_int.add_task(SIZE * sizeof(int), SIZE * sizeof(int), increment);
+		seq_io_int.add_task(SIZE * sizeof(int)               , increment_io);
+		if(i%2) {
+			seq_hyb_int.add_task(SIZE * sizeof(int)               , increment_io);
+		}
+		else {
+			seq_hyb_int.add_task(SIZE * sizeof(int), SIZE * sizeof(int), increment);
+		}
+	}
+
+	seq_int.set_input(in_int, SIZE * sizeof(int));
+	seq_io_int.set_input(in_int, SIZE * sizeof(int));
+	seq_hyb_int.set_input(in_int, SIZE * sizeof(int));
+
+	seq_int.exec();
+	seq_io_int.exec();
+	seq_hyb_int.exec();
+
+	int *result_seq_int = (int*)seq_int.get_result();
+	int *result_seq_io = (int*)seq_io_int.get_result();
+	int *result_seq_hyb = (int*)seq_hyb_int.get_result();
+	
+	for(int i=0; i < SIZE; i++) {
+		assert(result_seq_int[i] == in_int[i] + SIZE_SEQ && "Erreur sur le resultat de sequence classique");
+		assert(result_seq_io[i] == in_int[i] + SIZE_SEQ && "Erreur sur le resultat de sequence io");
+		assert(result_seq_hyb[i] == in_int[i] + SIZE_SEQ && "Erreur sur le resultat de sequence hybride");
+	}
+
+	free(in_int);
+}
+
 int main(void){
-	std::ofstream output_file;
-	output_file.open("./donnee/data.csv");
-	//output_file << "temps_exec,temps_avec_copy,temps_sans_copy\n";
-	int i=10000000;
-	//for (int i=100;i<10000000;i=i*1.5){
-		//output_file << i << ",";
-		bench_sequence(i,output_file);
-		//}
-	//output_bench_sequence(i, output_file);
 	//tache();
 	//sequence();
 	//bench_tache();
-	//bench_sequence();
+	bench_sequence();
+	unit_test();
 	return 0;
 }
