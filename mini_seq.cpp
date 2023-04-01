@@ -48,8 +48,8 @@ void bench_sequence() {
 	Sequence seq_copyless;
 
 	for(int i=0; i < SIZE_SEQ; i++){
-		seq_copy.add_task(SIZE * sizeof(char), SIZE * sizeof(char), increment);
-		seq_copyless.add_task(SIZE * sizeof(char), increment_io);
+		seq_copy.add_task(SIZE * sizeof(char), SIZE * sizeof(char), increment_uint8);
+		seq_copyless.add_task(SIZE * sizeof(char), increment_uint8_io);
 	}
 	seq_copy.set_input(in, sizeof(char) * SIZE);
 	seq_copyless.set_input(in, sizeof(char) * SIZE);

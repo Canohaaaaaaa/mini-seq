@@ -27,15 +27,20 @@ void write_copy_copyless_size(int max_size, int seq_length, std::string path) {
 			seq_copy.add_task(i * sizeof(int), i * sizeof(int)   , increment);
 			seq_copyless.add_task(i * sizeof(int)                 , increment_io);
 		}
-		seq_copy.set_input(in, sizeof(int) * i);
-		seq_copyless.set_input(in, sizeof(int) * i);
-
-		seq_copy.exec();
-		seq_copyless.exec();
+		float total_copy = 0, total_copyless = 0;
+		// Moyenne sur 10 execs
+		for(int y=0; y < 10; y++){
+			seq_copy.set_input(in, sizeof(int) * i);
+			seq_copyless.set_input(in, sizeof(int) * i);
+			seq_copy.exec();
+			seq_copyless.exec();
+			total_copy += duration_cast<nanoseconds>(seq_copy.timestamps.back() - seq_copy.timestamps.front()).count() / 1000.f;
+			total_copyless += duration_cast<nanoseconds>(seq_copyless.timestamps.back() - seq_copyless.timestamps.front()).count() / 1000.f;
+		}
 
 		output_file << i << ",";
-		output_file << duration_cast<nanoseconds>(seq_copy.timestamps.back() - seq_copy.timestamps.front()).count() * 1e-3 << ",";
-		output_file << duration_cast<nanoseconds>(seq_copyless.timestamps.back() - seq_copyless.timestamps.front()).count() * 1e-3 << endl;
+		output_file << total_copy/10 << ",";
+		output_file << total_copyless/10 << endl;
 	}
 	
 	output_file.close();
@@ -58,15 +63,22 @@ void write_copy_copyless_length(int max_seq_length, int size, std::string path) 
 			seq_copy.add_task(size * sizeof(int), size * sizeof(int), increment);
 			seq_copyless.add_task(size * sizeof(int)                 , increment_io);
 		}
-		seq_copy.set_input(in, sizeof(int) * size);
-		seq_copyless.set_input(in, sizeof(int) * size);
+		float total_copy = 0, total_copyless = 0;
+		// Moyenne sur 10 execs
+		for(int j=0; j < 10; j++) {
+			seq_copy.set_input(in, sizeof(int) * size);
+			seq_copyless.set_input(in, sizeof(int) * size);
+			seq_copy.exec();
+			seq_copyless.exec();
 
-		seq_copy.exec();
-		seq_copyless.exec();
+			total_copy += duration_cast<nanoseconds>(seq_copy.timestamps.back() - seq_copy.timestamps.front()).count() / 1000.f;
+			total_copyless += duration_cast<nanoseconds>(seq_copyless.timestamps.back() - seq_copyless.timestamps.front()).count() / 1000.f;
+		}
+
 
 		output_file << i << ",";
-		output_file << duration_cast<nanoseconds>(seq_copy.timestamps.back() - seq_copy.timestamps.front()).count() * 1e-3 << ",";
-		output_file << duration_cast<nanoseconds>(seq_copyless.timestamps.back() - seq_copyless.timestamps.front()).count() * 1e-3 << endl;
+		output_file << total_copy/10 << ",";
+		output_file << total_copyless/10 << endl;
 	}
 	output_file.close();
 }
@@ -111,8 +123,8 @@ void write_hybrid(int regular_length, int io_length, std::string path) {
 		seq_homog.exec();
 		seq_hybrid.exec();
 		for(size_t i=1; i < seq_homog.timestamps.size(); i++) {
-			total_homog[i] += duration_cast<nanoseconds>(seq_homog.timestamps[i] - seq_homog.timestamps[i-1]).count() / 1000.f / 1000.f;
-			total_hybrid[i] += duration_cast<nanoseconds>(seq_hybrid.timestamps[i] - seq_hybrid.timestamps[i-1]).count() / 1000.f / 1000.f;
+			total_homog[i] += duration_cast<nanoseconds>(seq_homog.timestamps[i] - seq_homog.timestamps[i-1]).count() / 1000.f;
+			total_hybrid[i] += duration_cast<nanoseconds>(seq_hybrid.timestamps[i] - seq_hybrid.timestamps[i-1]).count() / 1000.f;
 		}
 	}
 	for(size_t i=1; i < seq_homog.timestamps.size(); i++){
