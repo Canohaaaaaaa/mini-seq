@@ -1,7 +1,7 @@
 #include "Write_data.hh"
 #include <fstream>
 #include <chrono>
-
+#include <cmath>
 using namespace std::chrono;
 
 void write_all() {
@@ -13,7 +13,7 @@ void write_all() {
 void write_copy_copyless_size(int max_size, int seq_length, std::string path) {
 	std::ofstream output_file;
 	output_file.open(path);
-	output_file << "Taille, Séquence avec copie, Séquence sans copie" << endl;
+	output_file << "Taille, Séquence avec copie, Séquence sans copie, Ecart-type copie, Ecart-type sans copie" << endl;
 
 	for(int i=1; i < max_size; i+=max_size/20) {
 		int *in = (int*)malloc(sizeof(int) * i);
@@ -28,19 +28,37 @@ void write_copy_copyless_size(int max_size, int seq_length, std::string path) {
 			seq_copyless.add_task(i * sizeof(int)                 , increment_io);
 		}
 		float total_copy = 0, total_copyless = 0;
+		float copy_times[10], copy_lesstimes[10];
+		seq_copy.set_input(in, sizeof(int) * i);
+		seq_copyless.set_input(in, sizeof(int) * i);
+		seq_copy.exec();
+		seq_copyless.exec();
 		// Moyenne sur 10 execs
 		for(int y=0; y < 10; y++){
 			seq_copy.set_input(in, sizeof(int) * i);
 			seq_copyless.set_input(in, sizeof(int) * i);
 			seq_copy.exec();
 			seq_copyless.exec();
+
 			total_copy += duration_cast<nanoseconds>(seq_copy.timestamps.back() - seq_copy.timestamps.front()).count() / 1000.f;
 			total_copyless += duration_cast<nanoseconds>(seq_copyless.timestamps.back() - seq_copyless.timestamps.front()).count() / 1000.f;
+			copy_times[y] = duration_cast<nanoseconds>(seq_copy.timestamps.back() - seq_copy.timestamps.front()).count() / 1000.f;
+			copy_lesstimes[y] = duration_cast<nanoseconds>(seq_copyless.timestamps.back() - seq_copyless.timestamps.front()).count() / 1000.f;		
 		}
+
+		float variance_copy = 0, variance_copyless = 0;
+		for(int j=0; j < 10; j++) {
+			cout << copy_times[j] << endl;
+			variance_copy += pow((copy_times[j] - total_copy/10), 2);
+			variance_copyless += pow((copy_lesstimes[j] - total_copyless/10), 2);
+		}
+		cout << endl;
 
 		output_file << i << ",";
 		output_file << total_copy/10 << ",";
-		output_file << total_copyless/10 << endl;
+		output_file << total_copyless/10 << ",";
+		output_file << sqrt(variance_copy/10) << ",";
+		output_file << sqrt(variance_copyless/10) << endl;
 	}
 	
 	output_file.close();
@@ -49,7 +67,7 @@ void write_copy_copyless_size(int max_size, int seq_length, std::string path) {
 void write_copy_copyless_length(int max_seq_length, int size, std::string path) {
 	std::ofstream output_file;
 	output_file.open(path);
-	output_file << "Longueur, Séquence avec copie, Séquence sans copie" << endl;
+	output_file << "Longueur, Séquence avec copie, Séquence sans copie, Ecart-type copie, Ecart-type sans copie" << endl;
 	int *in = (int*)malloc(sizeof(int) * size);
 
 	for(size_t i = 0; i < size ; i++){
@@ -64,6 +82,7 @@ void write_copy_copyless_length(int max_seq_length, int size, std::string path) 
 			seq_copyless.add_task(size * sizeof(int)                 , increment_io);
 		}
 		float total_copy = 0, total_copyless = 0;
+		float copy_times[10], copy_lesstimes[10];
 		// Moyenne sur 10 execs
 		for(int j=0; j < 10; j++) {
 			seq_copy.set_input(in, sizeof(int) * size);
@@ -73,12 +92,20 @@ void write_copy_copyless_length(int max_seq_length, int size, std::string path) 
 
 			total_copy += duration_cast<nanoseconds>(seq_copy.timestamps.back() - seq_copy.timestamps.front()).count() / 1000.f;
 			total_copyless += duration_cast<nanoseconds>(seq_copyless.timestamps.back() - seq_copyless.timestamps.front()).count() / 1000.f;
+			copy_times[j] = duration_cast<nanoseconds>(seq_copy.timestamps.back() - seq_copy.timestamps.front()).count() / 1000.f;
+			copy_lesstimes[j] = duration_cast<nanoseconds>(seq_copyless.timestamps.back() - seq_copyless.timestamps.front()).count() / 1000.f;
 		}
 
-
+		float variance_copy = 0, variance_copyless = 0;
+		for(int j=0; j < 10; j++) {
+			variance_copy += pow((copy_times[j] - total_copy/10), 2);
+			variance_copyless += pow((copy_lesstimes[j] - total_copyless/10), 2);
+		}
 		output_file << i << ",";
 		output_file << total_copy/10 << ",";
-		output_file << total_copyless/10 << endl;
+		output_file << total_copyless/10 << ",";
+		output_file << sqrt(variance_copy/10) << ",";
+		output_file << sqrt(variance_copyless/10) << endl;
 	}
 	output_file.close();
 }
