@@ -5,9 +5,9 @@
 #include <cassert>
 #include "Task.hh"
 #include "Sequence.hh"
-#define SIZE 2048
-#define SIZE_SEQ 6
 #define DETAIL false
+int SIZE = 2048;
+int SIZE_SEQ = 6;
 
 using namespace std::chrono;
 using std::function, std::vector;
@@ -41,7 +41,7 @@ void bench_sequence() {
 	return;
 	#endif
 	uint8_t *in = (uint8_t*)malloc(sizeof(char) * SIZE);
-	for(size_t i = 0; i < SIZE; i++){
+	for(int i = 0; i < SIZE; i++){
 		in[i] = i; 
 	}
 	Sequence seq_copy;
@@ -226,7 +226,13 @@ void unit_test() {
 	free(in_int);
 }
 
-int main(void){
+int main(int argc, char** argv) {
+	if(argc > 2) {
+		SIZE = atoi(argv[1]);
+	}
+	if(argc == 3) {
+		SIZE_SEQ = atoi(argv[2]);
+	}
 	//tache();
 	//sequence();
 	//bench_tache();

@@ -20,6 +20,7 @@ class Task{
 		output_size = output_socket->get_size();
 		output_data = output_socket->get_socket_data_addr();
 	}
+	virtual ~Task(){}
 
 	virtual void exec() {
 		func(input_size, *input_data, output_size, *output_data);
@@ -65,7 +66,6 @@ void increment(const size_t size_in, const void *in_data, const size_t size_out,
 	// Ici les size_in/out sont des nombres d'octets, a moins d'ecrire des chars on ne veut idealement pas iterer dessus
 	size_t in_array_size = size_in / sizeof(int);
 	int *out_int_array = (int*)out_data;
-	size_t out_array_size = size_out / sizeof(int);
 	for(size_t i=0; i < in_array_size; i++){
 		out_int_array[i] = in_int_array[i] + 1;
 	}

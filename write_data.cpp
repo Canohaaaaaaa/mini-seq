@@ -18,7 +18,7 @@ void write_copy_copyless_size(int max_size, int seq_length, std::string path) {
 	for(int i=1; i < max_size; i+=max_size/20) {
 		int *in = (int*)malloc(sizeof(int) * i);
 
-		for(size_t k = 0; k < i ; k++){
+		for(int k = 0; k < i ; k++){
 			in[k] = k; 
 		}
 		Sequence seq_copy;
@@ -52,7 +52,7 @@ void write_copy_copyless_length(int max_seq_length, int size, std::string path) 
 	output_file << "Longueur, Séquence avec copie, Séquence sans copie" << endl;
 	int *in = (int*)malloc(sizeof(int) * size);
 
-	for(size_t i = 0; i < size ; i++){
+	for(int i = 0; i < size ; i++){
 		in[i] = i; 
 	}
 
