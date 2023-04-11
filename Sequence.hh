@@ -8,7 +8,8 @@
 
 
 using namespace std::chrono;
-using std::vector, std::function;
+using std::vector;
+using std::function;
 
 class Sequence{
 	vector<Task*> tasks;
