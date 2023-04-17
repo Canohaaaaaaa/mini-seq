@@ -1,0 +1,685 @@
+desc: --time-unit=B
+cmd: ./write_data
+time_unit: B
+#-----------
+snapshot=0
+#-----------
+time=0
+mem_heap_B=0
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=1
+#-----------
+time=72712
+mem_heap_B=72704
+mem_heap_extra_B=8
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=2
+#-----------
+time=1072720
+mem_heap_B=1072704
+mem_heap_extra_B=16
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=3
+#-----------
+time=1072760
+mem_heap_B=1072736
+mem_heap_extra_B=24
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=4
+#-----------
+time=1072784
+mem_heap_B=1072752
+mem_heap_extra_B=32
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=5
+#-----------
+time=2072792
+mem_heap_B=2072752
+mem_heap_extra_B=40
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=6
+#-----------
+time=2072928
+mem_heap_B=2072872
+mem_heap_extra_B=56
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=7
+#-----------
+time=2072952
+mem_heap_B=2072880
+mem_heap_extra_B=72
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=8
+#-----------
+time=2073088
+mem_heap_B=2073000
+mem_heap_extra_B=88
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=9
+#-----------
+time=2073112
+mem_heap_B=2073016
+mem_heap_extra_B=96
+mem_stacks_B=0
+heap_tree=detailed
+n4: 2073016 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 1000000 0x10B908: heap_test() (in /home/nourdinne/Code/C++/mini-seq/write_data)
+  n0: 1000000 0x10B11C: main (in /home/nourdinne/Code/C++/mini-seq/write_data)
+ n1: 1000000 0x10BE3A: heap_test() (in /home/nourdinne/Code/C++/mini-seq/write_data)
+  n0: 1000000 0x10B11C: main (in /home/nourdinne/Code/C++/mini-seq/write_data)
+ n1: 72704 0x490C979: ??? (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.30)
+  n1: 72704 0x400647D: call_init.part.0 (dl-init.c:70)
+   n1: 72704 0x4006567: call_init (dl-init.c:33)
+    n1: 72704 0x4006567: _dl_init (dl-init.c:117)
+     n0: 72704 0x40202E9: ??? (in /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2)
+ n0: 312 in 4 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=10
+#-----------
+time=2073112
+mem_heap_B=2073016
+mem_heap_extra_B=96
+mem_stacks_B=0
+heap_tree=peak
+n4: 2073016 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 1000000 0x10B908: heap_test() (in /home/nourdinne/Code/C++/mini-seq/write_data)
+  n0: 1000000 0x10B11C: main (in /home/nourdinne/Code/C++/mini-seq/write_data)
+ n1: 1000000 0x10BE3A: heap_test() (in /home/nourdinne/Code/C++/mini-seq/write_data)
+  n0: 1000000 0x10B11C: main (in /home/nourdinne/Code/C++/mini-seq/write_data)
+ n1: 72704 0x490C979: ??? (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.30)
+  n1: 72704 0x400647D: call_init.part.0 (dl-init.c:70)
+   n1: 72704 0x4006567: call_init (dl-init.c:33)
+    n1: 72704 0x4006567: _dl_init (dl-init.c:117)
+     n0: 72704 0x40202E9: ??? (in /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2)
+ n0: 312 in 4 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=11
+#-----------
+time=2073136
+mem_heap_B=2073008
+mem_heap_extra_B=80
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=12
+#-----------
+time=2073272
+mem_heap_B=2073128
+mem_heap_extra_B=96
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=13
+#-----------
+time=2073312
+mem_heap_B=2073160
+mem_heap_extra_B=104
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=14
+#-----------
+time=2073336
+mem_heap_B=2073144
+mem_heap_extra_B=96
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=15
+#-----------
+time=2073472
+mem_heap_B=2073264
+mem_heap_extra_B=112
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=16
+#-----------
+time=2073608
+mem_heap_B=2073384
+mem_heap_extra_B=128
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=17
+#-----------
+time=2073680
+mem_heap_B=2073448
+mem_heap_extra_B=136
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=18
+#-----------
+time=2073720
+mem_heap_B=2073416
+mem_heap_extra_B=128
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=19
+#-----------
+time=2073856
+mem_heap_B=2073536
+mem_heap_extra_B=144
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=20
+#-----------
+time=2073992
+mem_heap_B=2073656
+mem_heap_extra_B=160
+mem_stacks_B=0
+heap_tree=detailed
+n4: 2073656 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 1000000 0x10B908: heap_test() (in /home/nourdinne/Code/C++/mini-seq/write_data)
+  n0: 1000000 0x10B11C: main (in /home/nourdinne/Code/C++/mini-seq/write_data)
+ n1: 1000000 0x10BE3A: heap_test() (in /home/nourdinne/Code/C++/mini-seq/write_data)
+  n0: 1000000 0x10B11C: main (in /home/nourdinne/Code/C++/mini-seq/write_data)
+ n1: 72704 0x490C979: ??? (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.30)
+  n1: 72704 0x400647D: call_init.part.0 (dl-init.c:70)
+   n1: 72704 0x4006567: call_init (dl-init.c:33)
+    n1: 72704 0x4006567: _dl_init (dl-init.c:117)
+     n0: 72704 0x40202E9: ??? (in /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2)
+ n0: 952 in 4 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=21
+#-----------
+time=2074128
+mem_heap_B=2073776
+mem_heap_extra_B=176
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=22
+#-----------
+time=2074264
+mem_heap_B=2073896
+mem_heap_extra_B=192
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=23
+#-----------
+time=2074400
+mem_heap_B=2074024
+mem_heap_extra_B=200
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=24
+#-----------
+time=2074472
+mem_heap_B=2073960
+mem_heap_extra_B=192
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=25
+#-----------
+time=2074608
+mem_heap_B=2074080
+mem_heap_extra_B=208
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=26
+#-----------
+time=2074744
+mem_heap_B=2074200
+mem_heap_extra_B=224
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=27
+#-----------
+time=2074880
+mem_heap_B=2074320
+mem_heap_extra_B=240
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=28
+#-----------
+time=2075016
+mem_heap_B=2074440
+mem_heap_extra_B=256
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=29
+#-----------
+time=2075152
+mem_heap_B=2074560
+mem_heap_extra_B=272
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=30
+#-----------
+time=2075288
+mem_heap_B=2074680
+mem_heap_extra_B=288
+mem_stacks_B=0
+heap_tree=detailed
+n4: 2074680 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 1000000 0x10B908: heap_test() (in /home/nourdinne/Code/C++/mini-seq/write_data)
+  n0: 1000000 0x10B11C: main (in /home/nourdinne/Code/C++/mini-seq/write_data)
+ n1: 1000000 0x10BE3A: heap_test() (in /home/nourdinne/Code/C++/mini-seq/write_data)
+  n0: 1000000 0x10B11C: main (in /home/nourdinne/Code/C++/mini-seq/write_data)
+ n1: 72704 0x490C979: ??? (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.30)
+  n1: 72704 0x400647D: call_init.part.0 (dl-init.c:70)
+   n1: 72704 0x4006567: call_init (dl-init.c:33)
+    n1: 72704 0x4006567: _dl_init (dl-init.c:117)
+     n0: 72704 0x40202E9: ??? (in /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2)
+ n0: 1976 in 4 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=31
+#-----------
+time=2075424
+mem_heap_B=2074800
+mem_heap_extra_B=304
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=32
+#-----------
+time=2075560
+mem_heap_B=2074920
+mem_heap_extra_B=320
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=33
+#-----------
+time=2075824
+mem_heap_B=2075176
+mem_heap_extra_B=328
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=34
+#-----------
+time=2075960
+mem_heap_B=2075048
+mem_heap_extra_B=320
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=35
+#-----------
+time=2076096
+mem_heap_B=2075168
+mem_heap_extra_B=336
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=36
+#-----------
+time=2076232
+mem_heap_B=2075288
+mem_heap_extra_B=352
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=37
+#-----------
+time=2076368
+mem_heap_B=2075408
+mem_heap_extra_B=368
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=38
+#-----------
+time=2076392
+mem_heap_B=2075416
+mem_heap_extra_B=384
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=39
+#-----------
+time=2076416
+mem_heap_B=2075432
+mem_heap_extra_B=392
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=40
+#-----------
+time=2076440
+mem_heap_B=2075424
+mem_heap_extra_B=376
+mem_stacks_B=0
+heap_tree=detailed
+n4: 2075424 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 1000000 0x10B908: heap_test() (in /home/nourdinne/Code/C++/mini-seq/write_data)
+  n0: 1000000 0x10B11C: main (in /home/nourdinne/Code/C++/mini-seq/write_data)
+ n1: 1000000 0x10BE3A: heap_test() (in /home/nourdinne/Code/C++/mini-seq/write_data)
+  n0: 1000000 0x10B11C: main (in /home/nourdinne/Code/C++/mini-seq/write_data)
+ n1: 72704 0x490C979: ??? (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.30)
+  n1: 72704 0x400647D: call_init.part.0 (dl-init.c:70)
+   n1: 72704 0x4006567: call_init (dl-init.c:33)
+    n1: 72704 0x4006567: _dl_init (dl-init.c:117)
+     n0: 72704 0x40202E9: ??? (in /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2)
+ n0: 2720 in 5 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=41
+#-----------
+time=2076480
+mem_heap_B=2075456
+mem_heap_extra_B=384
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=42
+#-----------
+time=2076504
+mem_heap_B=2075440
+mem_heap_extra_B=376
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=43
+#-----------
+time=2076576
+mem_heap_B=2075504
+mem_heap_extra_B=384
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=44
+#-----------
+time=2076616
+mem_heap_B=2075472
+mem_heap_extra_B=376
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=45
+#-----------
+time=2076752
+mem_heap_B=2075600
+mem_heap_extra_B=384
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=46
+#-----------
+time=2076824
+mem_heap_B=2075536
+mem_heap_extra_B=376
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=47
+#-----------
+time=2077088
+mem_heap_B=2075792
+mem_heap_extra_B=384
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=48
+#-----------
+time=2077224
+mem_heap_B=2075664
+mem_heap_extra_B=376
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=49
+#-----------
+time=3077232
+mem_heap_B=1075664
+mem_heap_extra_B=368
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=50
+#-----------
+time=3077272
+mem_heap_B=1075632
+mem_heap_extra_B=360
+mem_stacks_B=0
+heap_tree=detailed
+n3: 1075632 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 1000000 0x10B908: heap_test() (in /home/nourdinne/Code/C++/mini-seq/write_data)
+  n0: 1000000 0x10B11C: main (in /home/nourdinne/Code/C++/mini-seq/write_data)
+ n1: 72704 0x490C979: ??? (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.30)
+  n1: 72704 0x400647D: call_init.part.0 (dl-init.c:70)
+   n1: 72704 0x4006567: call_init (dl-init.c:33)
+    n1: 72704 0x4006567: _dl_init (dl-init.c:117)
+     n0: 72704 0x40202E9: ??? (in /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2)
+ n0: 2928 in 6 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=51
+#-----------
+time=3077408
+mem_heap_B=1075512
+mem_heap_extra_B=344
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=52
+#-----------
+time=3077544
+mem_heap_B=1075392
+mem_heap_extra_B=328
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=53
+#-----------
+time=3077680
+mem_heap_B=1075272
+mem_heap_extra_B=312
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=54
+#-----------
+time=3077816
+mem_heap_B=1075152
+mem_heap_extra_B=296
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=55
+#-----------
+time=3077952
+mem_heap_B=1075032
+mem_heap_extra_B=280
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=56
+#-----------
+time=3078088
+mem_heap_B=1074912
+mem_heap_extra_B=264
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=57
+#-----------
+time=3078224
+mem_heap_B=1074792
+mem_heap_extra_B=248
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=58
+#-----------
+time=3078360
+mem_heap_B=1074672
+mem_heap_extra_B=232
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=59
+#-----------
+time=3078496
+mem_heap_B=1074552
+mem_heap_extra_B=216
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=60
+#-----------
+time=3078632
+mem_heap_B=1074432
+mem_heap_extra_B=200
+mem_stacks_B=0
+heap_tree=detailed
+n3: 1074432 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 1000000 0x10B908: heap_test() (in /home/nourdinne/Code/C++/mini-seq/write_data)
+  n0: 1000000 0x10B11C: main (in /home/nourdinne/Code/C++/mini-seq/write_data)
+ n1: 72704 0x490C979: ??? (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.30)
+  n1: 72704 0x400647D: call_init.part.0 (dl-init.c:70)
+   n1: 72704 0x4006567: call_init (dl-init.c:33)
+    n1: 72704 0x4006567: _dl_init (dl-init.c:117)
+     n0: 72704 0x40202E9: ??? (in /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2)
+ n0: 1728 in 6 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=61
+#-----------
+time=3078768
+mem_heap_B=1074312
+mem_heap_extra_B=184
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=62
+#-----------
+time=3078904
+mem_heap_B=1074192
+mem_heap_extra_B=168
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=63
+#-----------
+time=3079040
+mem_heap_B=1074072
+mem_heap_extra_B=152
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=64
+#-----------
+time=3079176
+mem_heap_B=1073952
+mem_heap_extra_B=136
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=65
+#-----------
+time=3079312
+mem_heap_B=1073832
+mem_heap_extra_B=120
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=66
+#-----------
+time=3079448
+mem_heap_B=1073712
+mem_heap_extra_B=104
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=67
+#-----------
+time=3079584
+mem_heap_B=1073592
+mem_heap_extra_B=88
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=68
+#-----------
+time=3079720
+mem_heap_B=1073472
+mem_heap_extra_B=72
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=69
+#-----------
+time=3079856
+mem_heap_B=1073352
+mem_heap_extra_B=56
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=70
+#-----------
+time=3079992
+mem_heap_B=1073232
+mem_heap_extra_B=40
+mem_stacks_B=0
+heap_tree=detailed
+n3: 1073232 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 1000000 0x10B908: heap_test() (in /home/nourdinne/Code/C++/mini-seq/write_data)
+  n0: 1000000 0x10B11C: main (in /home/nourdinne/Code/C++/mini-seq/write_data)
+ n1: 72704 0x490C979: ??? (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.30)
+  n1: 72704 0x400647D: call_init.part.0 (dl-init.c:70)
+   n1: 72704 0x4006567: call_init (dl-init.c:33)
+    n1: 72704 0x4006567: _dl_init (dl-init.c:117)
+     n0: 72704 0x40202E9: ??? (in /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2)
+ n0: 528 in 6 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=71
+#-----------
+time=3080256
+mem_heap_B=1072976
+mem_heap_extra_B=32
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=72
+#-----------
+time=3080280
+mem_heap_B=1072960
+mem_heap_extra_B=24
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=73
+#-----------
+time=3080544
+mem_heap_B=1072704
+mem_heap_extra_B=16
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=74
+#-----------
+time=3153256
+mem_heap_B=1000000
+mem_heap_extra_B=8
+mem_stacks_B=0
+heap_tree=empty
