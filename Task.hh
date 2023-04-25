@@ -62,8 +62,7 @@ class Task_IO : public Task{
 };
 
 void increment(const size_t size_in, const void *in_data, const size_t size_out, void *out_data) {
-	const int *in_int_array = (int*)in_data;
-	// Ici les size_in/out sont des nombres d'octets, a moins d'ecrire des chars on ne veut idealement pas iterer dessus
+	int *in_int_array = (int*)in_data;
 	size_t in_array_size = size_in / sizeof(int);
 	int *out_int_array = (int*)out_data;
 	for(size_t i=0; i < in_array_size; i++){
@@ -73,14 +72,14 @@ void increment(const size_t size_in, const void *in_data, const size_t size_out,
 
 void increment_io(const size_t size_in, void *data) {
 	int * in_int_array = (int*)data;
-	int in_array_size = size_in / sizeof(int);
-	for(int i=0; i < in_array_size; i++){
+	size_t in_array_size = size_in / sizeof(int);
+	for(size_t i=0; i < in_array_size; i++){
 		in_int_array[i] = in_int_array[i] + 1;
 	}
 }
 
 void increment_uint8(const size_t size_in, const void *in_data, const size_t size_out, void *out_data) {
-	const uint8_t *in_int_array = (uint8_t*)in_data;
+	uint8_t *in_int_array = (uint8_t*)in_data;
 	size_t in_array_size = size_in / sizeof(uint8_t);
 	uint8_t *out_int_array = (uint8_t*)out_data;
 	for(size_t i=0; i < in_array_size; i++){
@@ -91,7 +90,7 @@ void increment_uint8(const size_t size_in, const void *in_data, const size_t siz
 void increment_uint8_io(const size_t size_in, void *data) {
 	uint8_t * in_int_array = (uint8_t*)data;
 	uint8_t in_array_size = size_in / sizeof(uint8_t);
-	for(uint8_t i=0; i < in_array_size; i++){
+	for(size_t i=0; i < in_array_size; i++){
 		in_int_array[i] = in_int_array[i] + 1;
 	}
 }
